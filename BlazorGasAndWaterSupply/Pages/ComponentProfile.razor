@@ -13,18 +13,14 @@
 <h4>Surname : @singleton.user.Surname</h4>
 <h4>Login : @singleton.user.Login</h4>
 
-@if (!singleton.user.FilledIn)
+@if (!singleton.user.FilledIn && singleton.user.Department != "Customer")
 {
     <EditForm Model="singleton.user" OnValidSubmit="Submit">
             <div class="form-group">
                 <label>Phone number:</label>
                 <InputMask @bind-Value="phoneNumber" class="form-control" data-mask="+7(000)-000-00-00" placeholder="Phone..."/>
-            @if (!ErrorParseInt(phoneNumber, 17))
-            {
-                <h4><span class="badge bg-secondary">Error</span></h4>
-            }
+                @if (!ErrorParseInt(phoneNumber, 17)){<h2><span class="badge bg-secondary">Error</span></h2>}
             </div>
-            
         <div class="form-group">
             <label>Email</label>
             <InputText @bind-Value="email" class="form-control" placeholder="Email..." />

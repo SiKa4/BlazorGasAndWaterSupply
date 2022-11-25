@@ -1,4 +1,5 @@
-﻿using MongoDB.Bson;
+﻿using BlazorGasAndWaterSupply.Data;
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
 namespace BlazorContolWork.Data
@@ -32,8 +33,12 @@ namespace BlazorContolWork.Data
         public string Adress { get; set; }
         [BsonIgnoreIfDefault]
         public string Organization { get; set; }
-        
+
         public bool FilledIn { get; set; }
+        [BsonIgnoreIfDefault]
+        public List<Project> Projects { get; set; }
+
+
 
         public User(string name, string surName, string password, string login, string department)
         {
