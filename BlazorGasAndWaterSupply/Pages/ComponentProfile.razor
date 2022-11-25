@@ -16,37 +16,44 @@
 @if (!singleton.user.FilledIn)
 {
     <EditForm Model="singleton.user" OnValidSubmit="Submit">
-        <div class="form-group">
-            <label>Phone number:</label>
-            <InputMask @bind-Value="phoneNumber" class="form-control" data-mask="+7(000)-000-00-00" placeholder="Phone..."/>
-        </div>
+            <div class="form-group">
+                <label>Phone number:</label>
+                <InputMask @bind-Value="phoneNumber" class="form-control" data-mask="+7(000)-000-00-00" placeholder="Phone..."/>
+            @if (!ErrorParseInt(phoneNumber, 17))
+            {
+                <h4><span class="badge bg-secondary">Error</span></h4>
+            }
+            </div>
+            
         <div class="form-group">
             <label>Email</label>
             <InputText @bind-Value="email" class="form-control" placeholder="Email..." />
+            @if (!email.Contains('@')){ <h2><span class="badge bg-secondary">Error</span></h2> }
         </div>
          <div class="form-group">
             <label>Organization</label>
             <InputText @bind-Value="organization" class="form-control" placeholder="Organization..." />
+            @if (organization.Length < 10){ <h2><span class="badge bg-secondary">Error</span></h2> }
         </div>
         <div class="form-group">
             <label>OGRN</label>
-            <InputMask @bind-Value="ogrn" class="form-control" data-mask="0000000000000"
-                   placeholder="OGRN..." />
+            <InputMask @bind-Value="ogrn" class="form-control" data-mask="0000000000000" placeholder="OGRN..." />
+            @if (!ErrorParseInt(ogrn, 13)){ <h2><span class="badge bg-secondary">Error</span></h2> }
         </div>
          <div class="form-group">
             <label>INN</label>
-            <InputMask @bind-Value="inn" class="form-control" data-mask="0000000000"
-                   placeholder="INN..." />
+            <InputMask @bind-Value="inn" class="form-control" data-mask="0000000000" placeholder="INN..." />
+            @if (!ErrorParseInt(inn, 10)){ <h2><span class="badge bg-secondary">Error</span></h2> }
         </div>
          <div class="form-group">
             <label>KPP</label>
-            <InputMask @bind-Value="kpp" class="form-control" data-mask="000000000"
-                   placeholder="KPP..." />
+            <InputMask @bind-Value="kpp" class="form-control" data-mask="000000000" placeholder="KPP..."/>
+            @if (!ErrorParseInt(kpp, 9)){ <h2><span class="badge bg-secondary">Error</span></h2> }
         </div>
         <div class="form-group">
             <label>Adress</label>
-            <InputText @bind-Value="adress" class="form-control"
-                   placeholder="Adress..." />
+            <InputText @bind-Value="adress" class="form-control" placeholder="Adress..." />
+            @if (organization.Length < 10){ <h2><span class="badge bg-secondary">Error</span></h2> }
         </div>
         <ValidationSummary />
         <DataAnnotationsValidator />
@@ -87,7 +94,6 @@ else
     private string ogrn = string.Empty;
     private string organization = string.Empty;
 
-
     private string stringPath = string.Empty;
     private string fileName = string.Empty;
     private string photoPath = string.Empty;
@@ -97,7 +103,6 @@ else
 
     protected override void OnInitialized()
     {
-        Phone = "";
         if(singleton.user._idPhoto != new ObjectId())
         {
             PhotoSystemService.DownloadToLocal(env.WebRootPath, singleton.user);
@@ -113,8 +118,8 @@ else
 
     private async Task BtnSave()
     {
-        if (stringPath != string.Empty && phoneNumber.Length == 17 && email != string.Empty && inn != string.Empty
-            && kpp != string.Empty && ogrn != string.Empty && organization != string.Empty)
+        if (stringPath != string.Empty && phoneNumber.Length == 17 && email.Contains('@') == true && ErrorParseInt(inn, 10)
+            && ErrorParseInt(kpp, 9) && ErrorParseInt(ogrn, 13) && organization.Length >= 10 && adress.Length >= 10)
         {
             singleton.user.TopUp(email, phoneNumber, ogrn, inn, kpp, adress, organization);
             await PhotoSystemService.UploadImageToDb(stringPath, fileName, singleton.user);
@@ -144,12 +149,17 @@ else
         }
     }
 
-    InputMask mask { get; set; }
     bool wasSubmitted { get; set; }
 
     private void Submit()
     {
         wasSubmitted = true;
+    }
+
+    private bool ErrorParseInt(string value, int quantity)
+    {
+        if (value.Length == quantity) return true;
+        return false;
     }
 }
 
