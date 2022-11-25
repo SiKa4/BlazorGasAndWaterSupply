@@ -1,0 +1,155 @@
+﻿@using Microsoft.Extensions.Logging
+@using MongoDB.Bson
+@inject SingletonServices singleton
+@inject NavigationManager NavigationManager
+@inject IWebHostEnvironment env
+
+<h3>Profile</h3>
+
+<p>
+    <img id="image" class="img-rad" src="@photoPath" height="100" width="100"/>
+</p>
+<h4>Name : @singleton.user.Name</h4>
+<h4>Surname : @singleton.user.Surname</h4>
+<h4>Login : @singleton.user.Login</h4>
+
+@if (!singleton.user.FilledIn)
+{
+    <EditForm Model="singleton.user" OnValidSubmit="Submit">
+        <div class="form-group">
+            <label>Phone number:</label>
+            <InputMask @bind-Value="phoneNumber" class="form-control" data-mask="+7(000)-000-00-00" placeholder="Phone..."/>
+        </div>
+        <div class="form-group">
+            <label>Email</label>
+            <InputText @bind-Value="email" class="form-control" placeholder="Email..." />
+        </div>
+         <div class="form-group">
+            <label>Organization</label>
+            <InputText @bind-Value="organization" class="form-control" placeholder="Organization..." />
+        </div>
+        <div class="form-group">
+            <label>OGRN</label>
+            <InputMask @bind-Value="ogrn" class="form-control" data-mask="0000000000000"
+                   placeholder="OGRN..." />
+        </div>
+         <div class="form-group">
+            <label>INN</label>
+            <InputMask @bind-Value="inn" class="form-control" data-mask="0000000000"
+                   placeholder="INN..." />
+        </div>
+         <div class="form-group">
+            <label>KPP</label>
+            <InputMask @bind-Value="kpp" class="form-control" data-mask="000000000"
+                   placeholder="KPP..." />
+        </div>
+        <div class="form-group">
+            <label>Adress</label>
+            <InputText @bind-Value="adress" class="form-control"
+                   placeholder="Adress..." />
+        </div>
+        <ValidationSummary />
+        <DataAnnotationsValidator />
+    </EditForm>
+    <div class="mb-3">
+        <InputFile OnChange="@OnInputFileChange" multiple />
+    </div>
+    <button type="button" class="btn btn-danger" @onclick="BtnSave">Save</button>
+}
+else
+{
+    <h4>Department : @singleton.user.Department</h4>
+    <h4>Phone number : @singleton.user.PhoneNumber</h4>
+    <h4>Email : @singleton.user.Email</h4>
+    <h4>Adress : @singleton.user.Adress</h4>
+    <h4>Organization : @singleton.user.Organization</h4>
+    <h4>OGRN : @singleton.user.OGRN</h4>
+    <h4>INN : @singleton.user.INN</h4>
+    <h4>KPP : @singleton.user.KPP</h4>
+}
+@if (wasSubmitted)
+{
+    <div class="alert alert-success" role="alert">
+        OK!
+    </div>
+}
+
+<button type="button" class="btn btn-danger" @onclick = "BtnOutput">Output</button>
+
+
+@code {
+
+    private string phoneNumber = string.Empty;
+    private string email = string.Empty;
+    private string adress = string.Empty;
+    private string inn = string.Empty;
+    private string kpp = string.Empty;
+    private string ogrn = string.Empty;
+    private string organization = string.Empty;
+
+
+    private string stringPath = string.Empty;
+    private string fileName = string.Empty;
+    private string photoPath = string.Empty;
+
+    private int maxAllowedFiles = 1;
+    IReadOnlyList<IBrowserFile> selectedFiles;
+
+    protected override void OnInitialized()
+    {
+        Phone = "";
+        if(singleton.user._idPhoto != new ObjectId())
+        {
+            PhotoSystemService.DownloadToLocal(env.WebRootPath, singleton.user);
+            photoPath = $"\\Images\\{PhotoSystemService.GetNameInDb(singleton.user)}";
+        }
+    }
+
+    private void BtnOutput()
+    {
+        singleton.LogIn = false;
+        NavigationManager.NavigateTo("/");
+    }
+
+    private async Task BtnSave()
+    {
+        if (stringPath != string.Empty && phoneNumber.Length == 17 && email != string.Empty && inn != string.Empty
+            && kpp != string.Empty && ogrn != string.Empty && organization != string.Empty)
+        {
+            singleton.user.TopUp(email, phoneNumber, ogrn, inn, kpp, adress, organization);
+            await PhotoSystemService.UploadImageToDb(stringPath, fileName, singleton.user);
+            photoPath = $"\\Images\\{PhotoSystemService.GetNameInDb(singleton.user)}";
+            wasSubmitted = true;
+            MongoExamples.ReplaceById(singleton.user._id, singleton.user);
+        }
+    }
+
+    private void OnInputFileChange(InputFileChangeEventArgs e)
+    {
+        selectedFiles = e.GetMultipleFiles();
+        OnSubmit();
+    }
+
+    private async void OnSubmit()
+    {
+        foreach (var file in selectedFiles)
+        {
+            Stream stream = file.OpenReadStream(10000000000);
+            stringPath = $"{env.WebRootPath}\\Images\\{file.Name}";
+            fileName = file.Name;
+            FileStream fs = File.Create(stringPath);
+            await stream.CopyToAsync(fs);
+            stream.Close();
+            fs.Close();
+        }
+    }
+
+    InputMask mask { get; set; }
+    bool wasSubmitted { get; set; }
+
+    private void Submit()
+    {
+        wasSubmitted = true;
+    }
+}
+
