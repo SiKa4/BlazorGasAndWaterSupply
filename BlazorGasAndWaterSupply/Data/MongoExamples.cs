@@ -34,6 +34,13 @@ namespace BlazorContolWork.Data
             return one;
         }
 
+        public static List<User> FindUserDepartament(string departament)
+        {
+            UpdateBase();
+            var one = collection.Find(x => x.Department == departament).ToList();
+            return one;
+        }
+
         public static User FindLog(string log)
         {
             UpdateBase();

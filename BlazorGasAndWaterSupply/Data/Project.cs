@@ -9,6 +9,8 @@ namespace BlazorGasAndWaterSupply.Data
         [BsonIgnoreIfDefault]
         public ObjectId _id;
 
+        public string Name { get; set; }
+
         public string TypeProject { get; set; }
 
         [BsonIgnoreIfDefault]
@@ -23,8 +25,9 @@ namespace BlazorGasAndWaterSupply.Data
         [BsonIgnoreIfDefault]
         public List<DocumentsDesigner> DocumentsDesigners { get; set; }
 
-        public Project(string TypeProject)
+        public Project(string TypeProject, string Name)
         {
+            this.Name = Name;
             this.TypeProject = TypeProject;
         }
 
