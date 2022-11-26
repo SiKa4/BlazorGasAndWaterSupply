@@ -4,6 +4,7 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace BlazorContolWork.Data
 {
+    [BsonKnownTypes(typeof(User))]
     public class User
     {
         [BsonId]
@@ -35,8 +36,6 @@ namespace BlazorContolWork.Data
         public string Organization { get; set; }
 
         public bool FilledIn { get; set; }
-        [BsonIgnoreIfDefault]
-        public List<Project> Projects { get; set; }
 
 
 

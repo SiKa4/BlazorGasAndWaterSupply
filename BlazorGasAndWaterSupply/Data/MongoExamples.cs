@@ -1,4 +1,5 @@
 ﻿using BlazorContolWork.Data;
+using BlazorGasAndWaterSupply.Data;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
@@ -25,6 +26,19 @@ namespace BlazorContolWork.Data
         private static void UpdateBase()
         {
             collection = database.GetCollection<User>("UserReg");
+        }
+
+        public static void AddToDbProject(Project project)
+        {
+            IMongoCollection<Project> collectionProject = database.GetCollection<Project>("Projects");
+            collectionProject.InsertOne(project);
+        }
+
+        public static List<Project> SearchProjectCustomer(ObjectId _id)
+        {
+            IMongoCollection<Project> collectionProject = database.GetCollection<Project>("Projects");
+            var list = collectionProject.Find(x => x._idCustomer == _id).ToList();
+            return list;
         }
 
         public static User FindLogPass(string log, string pass)

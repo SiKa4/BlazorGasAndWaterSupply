@@ -10,7 +10,7 @@
 </div>
 
 <h3 class="text-center">Projects Table</h3>
-@if (singleton.user.Projects == null)
+@if (MongoExamples.SearchProjectCustomer(singleton.user._id).Count == 0)
 {
     <p>Uploading...</p>
 }
@@ -21,15 +21,17 @@ else
             <thead class="alert-dark">
                 <tr>
                     <th>Name</th>
-                    <th>Size</th>
-                    <th></th>
+                    <th>Developer</th>
+                    <th>Designer</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach (var project in singleton.user.Projects)
+                @foreach (var project in MongoExamples.SearchProjectCustomer(singleton.user._id))
                 {
-                    <tr @onclick="() => OnClickTr(project)">
-                        <td>@project.Name</td>
+                    <tr>
+                        <td><a href="">@project.Name</a></td>
+                        <td>@MongoExamples.FindId(project._idDeveloper).Name @MongoExamples.FindId(project._idDeveloper).Surname</td>
+                        <td>@MongoExamples.FindId(project._idDesigner).Name @MongoExamples.FindId(project._idDesigner).Surname</td>
                     </tr>
                 }
             </tbody>

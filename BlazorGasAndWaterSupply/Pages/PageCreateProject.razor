@@ -1,5 +1,8 @@
 ﻿@page "/pagecreateproject"
+@using BlazorGasAndWaterSupply.Data
+@using MongoDB.Bson
 @inject SingletonServices singleton
+@using MongoDB.Bson.Serialization.Attributes;
 
 
 <section class="vh-100" style="background-color: #2779e2;">
@@ -7,7 +10,7 @@
     <div class="row d-flex justify-content-center align-items-center h-100">
       <div class="col-xl-9">
 
-        <h1 class="text-white mb-4">Apply for a job</h1>
+        <h1 class="text-white mb-4">New Project</h1>
 
         <div class="card" style="border-radius: 15px;">
           <div class="card-body">
@@ -20,7 +23,7 @@
               </div>
               <div class="col-md-9 pe-5">
 
-                <input type="text" class="form-control form-control-lg" />
+                <input type="text" class="form-control form-control-lg" placeholder="Press Full Name" @bind="name"/>
 
               </div>
             </div>
@@ -35,12 +38,31 @@
               </div>
               <div class="col-md-9 pe-5">
                   <h4>
-                        <select @bind=@selectedDesigner>
+                        <select @bind=@loginDesigner>
+                            <option value=""></option> 
                         @foreach(var user in MongoExamples.FindUserDepartament("Designer"))
                         {
                         if(user.FilledIn == true)
                         {
-                        <option value="@user.Name">@user.Name</option> 
+                        <option value="@user.Login">@user.Name</option> 
+                        }
+                        }
+                        </select>
+                  </h4>
+              </div>
+
+               <div class="col-md-3 ps-5">
+                <h6 class="mb-0">Select Developer</h6>
+              </div>
+              <div class="col-md-9 pe-5">
+                  <h4>
+                        <select @bind=@loginDeveloper>
+                        <option value=""></option> 
+                        @foreach(var user in MongoExamples.FindUserDepartament("Developer"))
+                        {
+                        if(user.FilledIn == true)
+                        {
+                        <option value="@user.Login">@user.Name</option> 
                         }
                         }
                         </select>
@@ -50,42 +72,10 @@
 
             <hr class="mx-n3">
 
-            <div class="row align-items-center py-3">
-              <div class="col-md-3 ps-5">
-
-                <h6 class="mb-0">Full name</h6>
-
-              </div>
-              <div class="col-md-9 pe-5">
-
-                <textarea class="form-control" rows="3" placeholder="Message sent to the employer"></textarea>
-
-              </div>
-            </div>
-
-            <hr class="mx-n3">
-
-            <div class="row align-items-center py-3">
-              <div class="col-md-3 ps-5">
-
-                <h6 class="mb-0">Upload CV</h6>
-
-              </div>
-              <div class="col-md-9 pe-5">
-
-                <input class="form-control form-control-lg" id="formFileLg" type="file" />
-                <div class="small text-muted mt-2">Upload your CV/Resume or any other relevant file. Max file
-                  size 50 MB</div>
-
-              </div>
-            </div>
-
-            <hr class="mx-n3">
-
             <div class="px-5 py-4">
-              <button type="submit" class="btn btn-primary btn-lg">Send application</button>
+              <button type="submit" class="btn btn-primary btn-lg" @onclick=BtnClick>Create project</button>
             </div>
-
+  
           </div>
         </div>
 
@@ -95,5 +85,16 @@
 </section>
 
 @code{
-    string selectedDesigner = string.Empty;
+    public string loginDesigner = string.Empty;
+    public string loginDeveloper = string.Empty;
+    string name = string.Empty;
+
+    private void BtnClick()
+    {
+        if(loginDesigner != string.Empty && loginDeveloper != string.Empty && name != string.Empty)
+        {
+            Project temp = new Project("121221", name, MongoExamples.FindLog(loginDeveloper)._id, MongoExamples.FindLog(loginDesigner)._id, singleton.user._id);
+            MongoExamples.AddToDbProject(temp);
+        }
+    }
 }

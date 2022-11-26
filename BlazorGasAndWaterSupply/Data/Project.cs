@@ -3,6 +3,7 @@ using MongoDB.Bson;
 
 namespace BlazorGasAndWaterSupply.Data
 {
+    [BsonKnownTypes(typeof(Project))]
     public class Project
     {
         [BsonId]
@@ -12,6 +13,9 @@ namespace BlazorGasAndWaterSupply.Data
         public string Name { get; set; }
 
         public string TypeProject { get; set; }
+
+        [BsonIgnoreIfDefault]
+        public ObjectId _idCustomer;
 
         [BsonIgnoreIfDefault]
         public ObjectId _idDeveloper;
@@ -25,10 +29,13 @@ namespace BlazorGasAndWaterSupply.Data
         [BsonIgnoreIfDefault]
         public List<DocumentsDesigner> DocumentsDesigners { get; set; }
 
-        public Project(string TypeProject, string Name)
+        public Project(string TypeProject, string Name, ObjectId _idDeveloper, ObjectId _idDesigner, ObjectId _idCustomer)
         {
             this.Name = Name;
             this.TypeProject = TypeProject;
+            this._idDeveloper = _idDeveloper;
+            this._idDesigner = _idDesigner;
+            this._idCustomer = _idCustomer;
         }
 
     }
