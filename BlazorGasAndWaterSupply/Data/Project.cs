@@ -60,19 +60,18 @@ namespace BlazorGasAndWaterSupply.Data
         public ObjectId _id;
 
         [BsonIgnoreIfDefault]
-        public ObjectId _project;
+        public ObjectId _idFile;
 
         public bool IsOk { get; set; }
         public string Name { get; set; }
 
-        public DocumentDeveloper(ObjectId project,  string name)
+        public DocumentDeveloper(ObjectId _idFile,  string name)
         {
-            _project = project;
+            this._idFile = _idFile;
             IsOk = false;
             Name = name;
         }
     }
-
     public class DocumentDesigner
     {
         [BsonId]

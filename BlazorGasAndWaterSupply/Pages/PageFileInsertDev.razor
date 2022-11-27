@@ -2,7 +2,7 @@
 @using MongoDB.Bson
 @inject SingletonServices singleton
 @inject NavigationManager NavigationManager
-
+@inject IWebHostEnvironment env
 
 <h3 class="text-center">File Project</h3>
 
@@ -14,6 +14,7 @@
                 <tr>
                     <th>Name</th>
                     <th>Add file</th>
+                    <th>Download</th>
                     <th>Send</th>
                     <th>Delete</th>
                 </tr>
@@ -23,18 +24,12 @@
                 {
                     <tr>
                         <td>@info</td>
-                        @if (singleton.thisProject.DocumentsDeveloper.Find(x => x.Name == info) == null 
-                        && files.Find(x => x.Name == info) == null)
-                        {
-                            <td><InputFile OnChange="@OnInputFileChange" @onclick="() => OnClickInputFile(info)" /></td>
-                        }
-                        else if (singleton.thisProject.DocumentsDeveloper.Find(x => x.Name == info) != null)
+                        <td><InputFile OnChange="@OnInputFileChange" @onclick="() => OnClickInputFile(info)" /></td>
+
+                        @if (singleton.thisProject.DocumentsDeveloper.Find(x => x.Name == info) != null
+                       && singleton.thisProject.DocumentsDeveloper.Find(x => x.Name == info).Name == info)
                         {
                             <td><button type="button" class="btn btn-warning">Download Files</button></td>
-                        }
-                        else
-                        {
-                            <td></td>
                         }
                         @if (files.Find(x => x.Name == info) != null && files.Find(x => x.Name == info).Name == info)
                         {
@@ -64,6 +59,8 @@
 @code {
     List<ListAddFiles> files = new();
     string nameRow = string.Empty;
+    private string stringPath = string.Empty;
+    private string fileName = string.Empty;
 
     protected override void OnInitialized()
     {
@@ -81,21 +78,36 @@
         }
     }
 
-    private void OnClickInputFile(string rowName){ nameRow = rowName; }
+    private void OnClickInputFile(string rowName)
+    {
+        if (nameRow != rowName) nameRow = rowName;
+    }
 
     private void OnInputFileChange(InputFileChangeEventArgs e)
     {
-        foreach (var file in e.GetMultipleFiles())
+        foreach (var file in e.GetMultipleFiles(1))
         {
-            files.Add(new ListAddFiles(nameRow, file));
+            if (files.Find(x => x.Name == nameRow) == null) 
+                files.Add(new ListAddFiles(nameRow, file));
         }
     }
 
-    private void OnClickAddInBase(string rowName)
+    private async Task OnClickAddInBase(string rowName)
     {
-        var tempFile = files.Find(x => x.Name == rowName);
-        singleton.thisProject.DocumentsDeveloper.Add(new DocumentDeveloper(new ObjectId(), rowName));
-        files.Remove(tempFile);
+        var file = files.Find(x => x.Name == rowName);
+
+        Stream stream = file.File.OpenReadStream(100000000000);
+        stringPath = $"{env.WebRootPath}\\Files\\{file.File.Name}";
+        fileName = file.File.Name;
+        FileStream fs = File.Create(stringPath);
+        await stream.CopyToAsync(fs);
+        stream.Close();
+        fs.Close();
+
+        await FileSystemService.UploadFileToDb(stringPath, fileName);
+        files.Remove(file);
+        singleton.thisProject.DocumentsDeveloper.Add(new DocumentDeveloper(FileSystemService.SearchByNameId(fileName), rowName));
         MongoExamples.ReplaceProjectById(singleton.thisProject._id, singleton.thisProject);
     }
+
 }
