@@ -68,6 +68,21 @@
                         </label>
                     </div>
                 </div>
+                @if(selectedRole == "Customer")
+                {
+                    <div class="d-flex flex-row align-items-center mb-4">
+                        <i class="fas fa-lock fa-lg me-3 fa-fw"></i>
+                        <div class="form-outline flex-fill mb-0">
+                            <label>
+                                Select type project...
+                                    <select @bind=@selectedTypeProject>
+                                    <option value="Gasification">Gasification</option>
+                                    <option value="Water Supply">Water Supply</option>
+                                </select>
+                            </label>
+                        </div>
+                    </div>
+                }
 
                 <div class="form-check d-flex justify-content-center mb-5">
                 <input class="form-check-input me-2" type="checkbox" value="" id="form2Example3c" @bind="@userAgree"/>
@@ -108,6 +123,7 @@
     string userPassword = string.Empty;
     string userLastPassword = string.Empty;
     string selectedRole = string.Empty;
+    string selectedTypeProject = string.Empty;
 
     bool userAgree = false;
     bool error = false;
@@ -116,9 +132,20 @@
     {
         var tempLog = MongoExamples.FindLog(userLogin);
         if (userName != string.Empty && userSurname != string.Empty && userPassword != string.Empty && userLastPassword != string.Empty
-        && userPassword == userLastPassword && userAgree == true && userLogin != string.Empty && tempLog == null && selectedRole != string.Empty)
+        && userPassword == userLastPassword && userAgree == true && userLogin != string.Empty && tempLog == null && selectedRole != string.Empty 
+        && selectedRole != "Customer")
         {
             User temp = new User(userName, userSurname, userPassword, userLogin, selectedRole);
+            MongoExamples.AddToDB(temp);
+            singleton.LogIn = true;
+            singleton.user = temp;
+            NavigationManager.NavigateTo("/");
+        }
+        else if (userName != string.Empty && userSurname != string.Empty && userPassword != string.Empty && userLastPassword != string.Empty
+        && userPassword == userLastPassword && userAgree == true && userLogin != string.Empty && tempLog == null 
+        && selectedRole == "Customer" && selectedTypeProject != string.Empty)
+        {
+            User temp = new User(userName, userSurname, userPassword, userLogin, selectedRole, selectedTypeProject);
             MongoExamples.AddToDB(temp);
             singleton.LogIn = true;
             singleton.user = temp;

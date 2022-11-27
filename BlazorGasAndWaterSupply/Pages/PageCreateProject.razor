@@ -69,7 +69,16 @@
                   </h4>
               </div>
             </div>
+                    <div class="row align-items-center pt-4 pb-3">
+                        <div class="col-md-3 ps-5">
 
+                            <h6 class="mb-0">Type project</h6>
+
+                        </div>
+                        <div class="col-md-9 pe-5">
+                            <input type="text" class="form-control form-control-lg" @bind="singleton.user.TypeProject" readonly/>
+                        </div>
+                    </div>
             <hr class="mx-n3">
 
             <div class="px-5 py-4">
@@ -93,7 +102,7 @@
     {
         if(loginDesigner != string.Empty && loginDeveloper != string.Empty && name != string.Empty)
         {
-            Project temp = new Project("121221", name, MongoExamples.FindLog(loginDeveloper)._id, MongoExamples.FindLog(loginDesigner)._id, singleton.user._id);
+            Project temp = new Project(name, MongoExamples.FindLog(loginDeveloper)._id, MongoExamples.FindLog(loginDesigner)._id, singleton.user._id);
             MongoExamples.AddToDbProject(temp);
         }
     }

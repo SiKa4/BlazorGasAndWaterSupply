@@ -36,8 +36,8 @@ namespace BlazorContolWork.Data
         public string Organization { get; set; }
 
         public bool FilledIn { get; set; }
-
-
+        [BsonIgnoreIfDefault]
+        public string TypeProject { get; set; }
 
         public User(string name, string surName, string password, string login, string department)
         {
@@ -47,6 +47,17 @@ namespace BlazorContolWork.Data
             Login = login;
             Department = department;
             FilledIn = false;
+        }
+
+        public User(string name, string surName, string password, string login, string department, string typeProject)
+        {
+            Name = name;
+            Surname = surName;
+            Password = password;
+            Login = login;
+            Department = department;
+            FilledIn = false;
+            TypeProject = typeProject;
         }
 
         public void TopUp(string Email, string PhoneNumber)

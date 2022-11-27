@@ -1,5 +1,4 @@
 ﻿@page "/pagecustomer"
-@using BlazorGasAndWaterSupply.Data
 @inject SingletonServices singleton
 @inject NavigationManager NavigationManager
 
@@ -12,7 +11,7 @@
 <h3 class="text-center">Projects Table</h3>
 @if (MongoExamples.SearchProjectCustomer(singleton.user._id).Count == 0)
 {
-    <p>Uploading...</p>
+    <p>No Project...</p>
 }
 else
 {
@@ -23,15 +22,19 @@ else
                     <th>Name</th>
                     <th>Developer</th>
                     <th>Designer</th>
+                    <th>Type project</th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
                 @foreach (var project in MongoExamples.SearchProjectCustomer(singleton.user._id))
                 {
                     <tr>
-                        <td><a href="">@project.Name</a></td>
+                        <td><a>@project.Name</a></td>
                         <td>@MongoExamples.FindId(project._idDeveloper).Name @MongoExamples.FindId(project._idDeveloper).Surname</td>
                         <td>@MongoExamples.FindId(project._idDesigner).Name @MongoExamples.FindId(project._idDesigner).Surname</td>
+                        <td>@singleton.user.TypeProject</td>
+                        <td><button type="button" class="btn btn-success" @onclick="() => OnClickTr(project)">Open project</button></td>
                     </tr>
                 }
             </tbody>
@@ -41,7 +44,8 @@ else
 @code{
     private void OnClickTr(Project project)
     {
-        
+        singleton.thisProject = project;
+        ////
     }
 
     private void OnClickButton()

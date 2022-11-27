@@ -1,5 +1,6 @@
 ﻿using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Bson;
+using BlazorContolWork.Data;
 
 namespace BlazorGasAndWaterSupply.Data
 {
@@ -29,10 +30,10 @@ namespace BlazorGasAndWaterSupply.Data
         [BsonIgnoreIfDefault]
         public List<DocumentsDesigner> DocumentsDesigners { get; set; }
 
-        public Project(string TypeProject, string Name, ObjectId _idDeveloper, ObjectId _idDesigner, ObjectId _idCustomer)
+        public Project(string Name, ObjectId _idDeveloper, ObjectId _idDesigner, ObjectId _idCustomer)
         {
             this.Name = Name;
-            this.TypeProject = TypeProject;
+            TypeProject = MongoExamples.FindId(_idCustomer).TypeProject;
             this._idDeveloper = _idDeveloper;
             this._idDesigner = _idDesigner;
             this._idCustomer = _idCustomer;

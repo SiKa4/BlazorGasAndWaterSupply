@@ -17,12 +17,22 @@
             </NavLink>
         </div>
     </nav>
-    @if(singleton.user != null && singleton.user.Department == "Customer")
+    @if (singleton.user != null && singleton.user.FilledIn && singleton.user.Department == "Customer")
     {
         <nav class="flex-column">
             <div class="nav-item px-3">
                 <NavLink class="nav-link" href="pagecustomer" Match="NavLinkMatch.All">
-                    <span class="oi oi-home" aria-hidden="true"></span> Project
+                    <span class="oi oi-home" aria-hidden="true"></span>My Project
+                </NavLink>
+            </div>
+        </nav>
+    }
+    else if(singleton.user != null && singleton.user.FilledIn)
+    {
+        <nav class="flex-column">
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="pagecdeveloperanddesigner" Match="NavLinkMatch.All">
+                    <span class="oi oi-home" aria-hidden="true"></span>My Project
                 </NavLink>
             </div>
         </nav>
