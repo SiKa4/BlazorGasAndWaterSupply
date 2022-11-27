@@ -2,53 +2,49 @@
 @inject SingletonServices singleton
 @inject NavigationManager NavigationManager
 
-<div class="container">
-  <div class="row">
-    <div class="col-9"><button type="button" class="btn btn-success" @onclick="() => OnClickButton()">Add new project</button></div>
-      </div>
-</div>
 
 <h3 class="text-center">Projects Table</h3>
-@if (MongoExamples.SearchProjectCustomer(singleton.user._id).Count == 0)
+@if (MongoExamples.SearchProjectDeveloper(singleton.user._id).Count == 0 && MongoExamples.SearchProjectDesigner(singleton.user._id).Count == 0)
 {
     <p>No Project...</p>
 }
 else
 {
     <p class="text-center fw-bold mb-5 mx-1 mx-md-4 mt-4">
-        <table class="table table-bordered">
-            <thead class="alert-dark">
-                <tr>
-                    <th>Name</th>
-                    <th>Developer</th>
-                    <th>Designer</th>
-                    <th>Type project</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var project in MongoExamples.SearchProjectCustomer(singleton.user._id))
+            <table class="table table-bordered">
+                <thead class="alert-dark">
+                    <tr>
+                        <th>Name</th>
+                        <th>Type project</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var project in projects)
                 {
                     <tr>
                         <td><a>@project.Name</a></td>
-                        <td>@MongoExamples.FindId(project._idDeveloper).Name @MongoExamples.FindId(project._idDeveloper).Surname</td>
-                        <td>@MongoExamples.FindId(project._idDesigner).Name @MongoExamples.FindId(project._idDesigner).Surname</td>
-                        <td>@singleton.user.TypeProject</td>
-                        <td><button type="button" class="btn btn-success" @onclick="() => OnClickTr(project)">Open project</button></td>
+                        <td>@project.TypeProject</td>
+                        <td><button type="button" class="btn btn-success" @onclick="() => OnClickBtn(project)">Open project</button></td>
                     </tr>
                 }
-            </tbody>
-        </table>
-    </p>
+                </tbody>
+            </table>
+        </p>
 }
-@code{
-    private void OnClickTr(Project project)
+
+@code {
+    List<Project> projects = new List<Project>();
+
+    protected override void OnInitialized()
     {
-        singleton.thisProject = project;
+        projects = MongoExamples.SearchProjectDeveloper(singleton.user._id).Count != 0 ?
+        MongoExamples.SearchProjectDeveloper(singleton.user._id) : MongoExamples.SearchProjectDesigner(singleton.user._id);
     }
 
-    private void OnClickButton()
+    private void OnClickBtn(Project project)
     {
-        NavigationManager.NavigateTo("/pagecreateproject");
+        singleton.thisProject = project;
+        NavigationManager.NavigateTo("/pagefileinsertdevanddes");
     }
 }

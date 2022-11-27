@@ -41,6 +41,20 @@ namespace BlazorContolWork.Data
             return list;
         }
 
+        public static List<Project> SearchProjectDeveloper(ObjectId _id)
+        {
+            IMongoCollection<Project> collectionProject = database.GetCollection<Project>("Projects");
+            var list = collectionProject.Find(x => x._idDeveloper == _id).ToList();
+            return list;
+        }
+
+        public static List<Project> SearchProjectDesigner(ObjectId _id)
+        {
+            IMongoCollection<Project> collectionProject = database.GetCollection<Project>("Projects");
+            var list = collectionProject.Find(x => x._idDesigner == _id).ToList();
+            return list;
+        }
+
         public static User FindLogPass(string log, string pass)
         {
             UpdateBase();

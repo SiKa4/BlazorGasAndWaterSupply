@@ -1,0 +1,46 @@
+﻿@page "/pagefileinsertdevanddes"
+@inject SingletonServices singleton
+@inject NavigationManager NavigationManager
+
+
+<h3 class="text-center">File Project</h3>
+
+@if (singleton.user.Department == "Developer")
+{
+    <p class="text-center fw-bold mb-5 mx-1 mx-md-4 mt-4">
+        <table class="table table-bordered">
+            <thead class="alert-dark">
+                <tr>
+                    <th>Name</th>
+                    <th>Add file</th>
+                    <th>Send</th>
+                    <th>Delete</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var info in StringNameClass.returnArrayDev(singleton.thisProject.TypeProject))
+                {
+                    <tr>
+                        <td>@info</td>
+                        <td><InputFile OnChange="@OnInputFileChange" multiple /></td>
+                        <td><button type="button" class="btn btn-success">Send file</button></td>
+                        <td><button type="button" class="btn btn-success">Delete file</button></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </p>
+}
+
+@code {
+    List<Project> projects = new List<Project>();
+
+    protected override void OnInitialized()
+    {
+        
+    }
+
+    private void OnInputFileChange(InputFileChangeEventArgs e)
+    {
+    }
+}

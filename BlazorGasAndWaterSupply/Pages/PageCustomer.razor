@@ -34,7 +34,7 @@ else
                         <td>@MongoExamples.FindId(project._idDeveloper).Name @MongoExamples.FindId(project._idDeveloper).Surname</td>
                         <td>@MongoExamples.FindId(project._idDesigner).Name @MongoExamples.FindId(project._idDesigner).Surname</td>
                         <td>@singleton.user.TypeProject</td>
-                        <td><button type="button" class="btn btn-success" @onclick="() => OnClickTr(project)">Open project</button></td>
+                        <td><button type="button" class="btn btn-success" @onclick="() => OnClickBtn(project)">Open project</button></td>
                     </tr>
                 }
             </tbody>
@@ -42,7 +42,7 @@ else
     </p>
 }
 @code{
-    private void OnClickTr(Project project)
+    private void OnClickBtn(Project project)
     {
         singleton.thisProject = project;
         ////

@@ -1,6 +1,7 @@
 ﻿using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Bson;
 using BlazorContolWork.Data;
+using Microsoft.AspNetCore.Components.Forms;
 
 namespace BlazorGasAndWaterSupply.Data
 {
@@ -37,8 +38,9 @@ namespace BlazorGasAndWaterSupply.Data
             this._idDeveloper = _idDeveloper;
             this._idDesigner = _idDesigner;
             this._idCustomer = _idCustomer;
+            DocumentsDevelopers = new List<DocumentsDeveloper>();
+            DocumentsDesigners = new List<DocumentsDesigner>();
         }
-
     }
 
     public class DocumentsDeveloper
@@ -50,6 +52,16 @@ namespace BlazorGasAndWaterSupply.Data
         [BsonIgnoreIfDefault]
         public ObjectId _project;
 
+        public bool IsOk { get; set; }
+        public string Name { get; set; }
+
+        public DocumentsDeveloper(ObjectId id, ObjectId project, bool isOk, string name)
+        {
+            _id = id;
+            _project = project;
+            IsOk = isOk;
+            Name = name;
+        }
     }
 
     public class DocumentsDesigner
@@ -57,7 +69,7 @@ namespace BlazorGasAndWaterSupply.Data
         [BsonId]
         [BsonIgnoreIfDefault]
         public ObjectId _id;
-
+        public string Name { get; set; }
         public string DiameterAndLength { get; set; }
 
         [BsonIgnoreIfDefault]
