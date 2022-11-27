@@ -37,6 +37,23 @@
             "Согласование посадки котельной"
         };
 
+        static string[] WaterDes = new string[]
+        {
+            "Диаметр (мм) трубопровода и протяженность\r\nлинейного объекта (м)",
+            "Производительность БОС, м3/сут",
+            "кол.-во (шт) и производительность КНС (м3/ч)",
+            "Сметная стоимость работ, тыс. руб.",
+            "Срок разработки проектной документации, месяцев"
+        };
+
+        static string[] GasificationDes = new string[]
+        {
+            "Диаметр (мм) трубопровода и протяженность\r\nлинейного объекта (м)",
+            "Диаметр (мм) трубопровода и протяженность \r\nлинейного объекта (м)",
+            "Сметная стоимость работ, тыс. руб",
+            "Срок разработки проектной документации,\r\nмесяцев",
+        };
+
         public static string[] returnArrayDev(string code)
         {
             switch(code)
@@ -45,6 +62,18 @@
                     return GasificationDev;
                 case "Water Supply":
                     return WaterDev;
+            }
+            return null;
+        }
+
+        public static string[] returnArrayDes(string code)
+        {
+            switch (code)
+            {
+                case "Gasification":
+                    return GasificationDes;
+                case "Water Supply":
+                    return WaterDes;
             }
             return null;
         }
