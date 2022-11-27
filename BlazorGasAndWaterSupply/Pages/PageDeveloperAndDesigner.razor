@@ -45,6 +45,6 @@ else
     private void OnClickBtn(Project project)
     {
         singleton.thisProject = project;
-        NavigationManager.NavigateTo("/pagefileinsertdevanddes");
+        if (singleton.user.Department == "Developer") NavigationManager.NavigateTo("/pagefileinsertdev");
     }
 }

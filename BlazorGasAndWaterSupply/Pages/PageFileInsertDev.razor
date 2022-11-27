@@ -1,0 +1,101 @@
+﻿@page "/pagefileinsertdev"
+@using MongoDB.Bson
+@inject SingletonServices singleton
+@inject NavigationManager NavigationManager
+
+
+<h3 class="text-center">File Project</h3>
+
+@if (singleton.user.Department == "Developer")
+{
+    <p class="text-center fw-bold mb-5 mx-1 mx-md-4 mt-4">
+        <table class="table table-bordered">
+            <thead class="alert-dark">
+                <tr>
+                    <th>Name</th>
+                    <th>Add file</th>
+                    <th>Send</th>
+                    <th>Delete</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var info in StringNameClass.returnArrayDev(singleton.thisProject.TypeProject))
+                {
+                    <tr>
+                        <td>@info</td>
+                        @if (singleton.thisProject.DocumentsDeveloper.Find(x => x.Name == info) == null 
+                        && files.Find(x => x.Name == info) == null)
+                        {
+                            <td><InputFile OnChange="@OnInputFileChange" @onclick="() => OnClickInputFile(info)" /></td>
+                        }
+                        else if (singleton.thisProject.DocumentsDeveloper.Find(x => x.Name == info) != null)
+                        {
+                            <td><button type="button" class="btn btn-warning">Download Files</button></td>
+                        }
+                        else
+                        {
+                            <td></td>
+                        }
+                        @if (files.Find(x => x.Name == info) != null && files.Find(x => x.Name == info).Name == info)
+                        {
+                            <td><button type="button" class="btn btn-success" @onclick="() => OnClickAddInBase(info)">Send file</button></td>
+                        }
+                        else
+                        {
+                            <td></td>
+                        }
+                        @if (singleton.thisProject.DocumentsDeveloper.Find(x => x.Name == info) != null
+                       && singleton.thisProject.DocumentsDeveloper.Find(x => x.Name == info).Name == info 
+                       || files.Find(x => x.Name == info) != null && files.Find(x => x.Name == info).Name == info)
+                        {
+                            <td><button type="button" class="btn btn-warning" @onclick="() => OnDeleteClick(info)">Delete file</button></td>
+                        }
+                        else
+                        {
+                            <td></td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </p>
+}
+
+@code {
+    List<ListAddFiles> files = new();
+    string nameRow = string.Empty;
+
+    protected override void OnInitialized()
+    {
+    }
+
+    private void OnDeleteClick(string name)
+    {
+        var tempFileThis = files.Find(x => x.Name == name);
+        if (tempFileThis != null) files.Remove(tempFileThis);
+        var tempFileSingleton = singleton.thisProject.DocumentsDeveloper.Find(x => x.Name == name);
+        if (tempFileSingleton != null)
+        {
+            singleton.thisProject.DocumentsDeveloper.Remove(tempFileSingleton);
+            MongoExamples.ReplaceProjectById(singleton.thisProject._id, singleton.thisProject);
+        }
+    }
+
+    private void OnClickInputFile(string rowName){ nameRow = rowName; }
+
+    private void OnInputFileChange(InputFileChangeEventArgs e)
+    {
+        foreach (var file in e.GetMultipleFiles())
+        {
+            files.Add(new ListAddFiles(nameRow, file));
+        }
+    }
+
+    private void OnClickAddInBase(string rowName)
+    {
+        var tempFile = files.Find(x => x.Name == rowName);
+        singleton.thisProject.DocumentsDeveloper.Add(new DocumentDeveloper(new ObjectId(), rowName));
+        files.Remove(tempFile);
+        MongoExamples.ReplaceProjectById(singleton.thisProject._id, singleton.thisProject);
+    }
+}

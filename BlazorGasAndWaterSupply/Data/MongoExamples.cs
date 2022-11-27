@@ -55,6 +55,12 @@ namespace BlazorContolWork.Data
             return list;
         }
 
+        public static void ReplaceProjectById(ObjectId _id, Project project)
+        {
+            IMongoCollection<Project> collectionProject = database.GetCollection<Project>("Projects");
+            collectionProject.ReplaceOne(x => x._id == _id, project);
+        }
+
         public static User FindLogPass(string log, string pass)
         {
             UpdateBase();

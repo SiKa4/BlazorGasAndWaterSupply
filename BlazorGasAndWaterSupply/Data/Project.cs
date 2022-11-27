@@ -26,10 +26,10 @@ namespace BlazorGasAndWaterSupply.Data
         public ObjectId _idDesigner;
 
         [BsonIgnoreIfDefault]
-        public List<DocumentsDeveloper> DocumentsDevelopers { get; set; }
+        public List<DocumentDeveloper> DocumentsDeveloper { get; set; }
 
         [BsonIgnoreIfDefault]
-        public List<DocumentsDesigner> DocumentsDesigners { get; set; }
+        public List<DocumentDesigner> DocumentsDesigner { get; set; }
 
         public Project(string Name, ObjectId _idDeveloper, ObjectId _idDesigner, ObjectId _idCustomer)
         {
@@ -38,12 +38,22 @@ namespace BlazorGasAndWaterSupply.Data
             this._idDeveloper = _idDeveloper;
             this._idDesigner = _idDesigner;
             this._idCustomer = _idCustomer;
-            DocumentsDevelopers = new List<DocumentsDeveloper>();
-            DocumentsDesigners = new List<DocumentsDesigner>();
+            DocumentsDeveloper = new List<DocumentDeveloper>();
+            DocumentsDesigner = new List<DocumentDesigner>();
         }
     }
+    public class ListAddFiles
+    {
+        public string Name;
+        public IBrowserFile File;
 
-    public class DocumentsDeveloper
+        public ListAddFiles(string name, IBrowserFile file)
+        {
+            Name = name;
+            File = file;
+        }
+    }
+    public class DocumentDeveloper
     {
         [BsonId]
         [BsonIgnoreIfDefault]
@@ -55,16 +65,15 @@ namespace BlazorGasAndWaterSupply.Data
         public bool IsOk { get; set; }
         public string Name { get; set; }
 
-        public DocumentsDeveloper(ObjectId id, ObjectId project, bool isOk, string name)
+        public DocumentDeveloper(ObjectId project,  string name)
         {
-            _id = id;
             _project = project;
-            IsOk = isOk;
+            IsOk = false;
             Name = name;
         }
     }
 
-    public class DocumentsDesigner
+    public class DocumentDesigner
     {
         [BsonId]
         [BsonIgnoreIfDefault]
@@ -81,7 +90,7 @@ namespace BlazorGasAndWaterSupply.Data
 
         public string DevelopmentPeriod { get; set; }
 
-        public DocumentsDesigner(ObjectId id, string diameterAndLength, string bOS, string kNS, string costOfWork, string developmentPeriod)
+        public DocumentDesigner(ObjectId id, string diameterAndLength, string bOS, string kNS, string costOfWork, string developmentPeriod)
         {
             _id = id;
             DiameterAndLength = diameterAndLength;
@@ -91,7 +100,7 @@ namespace BlazorGasAndWaterSupply.Data
             DevelopmentPeriod = developmentPeriod;
         }
 
-        public DocumentsDesigner(ObjectId id, string diameterAndLength, string kNS, string costOfWork, string developmentPeriod)
+        public DocumentDesigner(ObjectId id, string diameterAndLength, string kNS, string costOfWork, string developmentPeriod)
         {
             _id = id;
             DiameterAndLength = diameterAndLength;
