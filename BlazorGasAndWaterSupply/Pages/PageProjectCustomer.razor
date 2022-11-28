@@ -1,0 +1,46 @@
+﻿@page "/pageprojectcustomer"
+@using MongoDB.Bson
+@inject SingletonServices singleton
+@inject NavigationManager NavigationManager
+
+<h3 class="text-center">Documents Developer : @MongoExamples.FindId(singleton.thisProject._idDeveloper).Name @MongoExamples.FindId(singleton.thisProject._idDeveloper).Surname</h3>
+
+<p class="text-center fw-bold mb-5 mx-1 mx-md-4 mt-4">
+    <table class="table table-bordered">
+        <thead class="alert-dark">
+            <tr>
+                <th>Name</th>
+                <th>Download File</th>
+                <th>Fit</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var info in StringNameClass.returnArrayDev(singleton.thisProject.TypeProject))
+            {
+                <tr>
+                    <td>@info</td>
+                    @if (singleton.thisProject.DocumentsDeveloper.Find(x => x.Name == info) != null &&
+                    singleton.thisProject.DocumentsDeveloper.Find(x => x.Name == info).Name == info)
+                    {
+                        <td><button type="button" class="btn btn-warning">Download Files</button></td>
+                        <td><input type="checkbox" @bind="@singleton.thisProject.DocumentsDeveloper.Find(x => x.Name == info).IsOk" @onclick="() => CheckboxClicked(info)" /></td>
+                    }
+                    else
+                    {
+                        <td>File not found</td>
+                        <td></td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+</p>
+
+
+@code {
+    public void CheckboxClicked(string rowName)
+    {
+        singleton.thisProject.DocumentsDeveloper.Find(x => x.Name == rowName).IsOk = !singleton.thisProject.DocumentsDeveloper.Find(x => x.Name == rowName).IsOk;
+        MongoExamples.ReplaceProjectById(singleton.thisProject._id, singleton.thisProject);
+    }
+}

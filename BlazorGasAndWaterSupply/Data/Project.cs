@@ -77,36 +77,17 @@ namespace BlazorGasAndWaterSupply.Data
         [BsonId]
         [BsonIgnoreIfDefault]
         public ObjectId _id;
+
+        public DocumentDesigner(string name, string text)
+        {
+            Name = name;
+            Text = text;
+            IsOk = false;
+        }
+
         public string Name { get; set; }
-        public string DiameterAndLength { get; set; }
-
-        [BsonIgnoreIfDefault]
-        public string BOS { get; set; }
-
-        public string KNS { get; set; }
-
-        public string CostOfWork { get; set; }
-
-        public string DevelopmentPeriod { get; set; }
-
-        public DocumentDesigner(ObjectId id, string diameterAndLength, string bOS, string kNS, string costOfWork, string developmentPeriod)
-        {
-            _id = id;
-            DiameterAndLength = diameterAndLength;
-            BOS = bOS;
-            KNS = kNS;
-            CostOfWork = costOfWork;
-            DevelopmentPeriod = developmentPeriod;
-        }
-
-        public DocumentDesigner(ObjectId id, string diameterAndLength, string kNS, string costOfWork, string developmentPeriod)
-        {
-            _id = id;
-            DiameterAndLength = diameterAndLength;
-            KNS = kNS;
-            CostOfWork = costOfWork;
-            DevelopmentPeriod = developmentPeriod;
-        }
+        public string Text { get; set; }
+        public bool IsOk { get; set; }
     }
 }
 

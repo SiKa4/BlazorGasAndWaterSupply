@@ -4,7 +4,7 @@
 @inject NavigationManager NavigationManager
 @inject IWebHostEnvironment env
 
-<h3 class="text-center">File Project</h3>
+<h3 class="text-center">File Designer</h3>
 
 
 <p class="text-center fw-bold mb-5 mx-1 mx-md-4 mt-4">
@@ -12,41 +12,41 @@
         <thead class="alert-dark">
             <tr>
                 <th>Name</th>
-                <th>Add file</th>
-                <th>Download</th>
-                <th>Send</th>
+                <th>To change</th>
+                <th>Info</th>
+                <th>Save</th>
                 <th>Delete</th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var info in StringNameClass.returnArrayDev(singleton.thisProject.TypeProject))
+            @foreach (var info in StringNameClass.returnArrayDes(singleton.thisProject.TypeProject))
             {
                 <tr>
                     <td>@info</td>
-                    <td><InputFile OnChange="@OnInputFileChange" @onclick="() => OnClickInputFile(info)" /></td>
+                    <td><button class="btn btn-success" @onclick="() => BtnOnChangeClick(info)">Change</button></td>
 
-                    @if (singleton.thisProject.DocumentsDeveloper.Find(x => x.Name == info) != null
-                    && singleton.thisProject.DocumentsDeveloper.Find(x => x.Name == info).Name == info)
+                    @if (onChangeRow == info)
                     {
-                        <td><button type="button" class="btn btn-warning" @onclick="() => OnDowloadClick(info)">Download Files</button></td>
+                        <td><input @bind="@txtInfo"/></td>
                     }
-                    @if (files.Find(x => x.Name == info) != null && files.Find(x => x.Name == info).Name == info)
+                    else if (singleton.thisProject.DocumentsDesigner.Find(x => x.Name == info) != null
+                    && singleton.thisProject.DocumentsDesigner.Find(x => x.Name == info).Name == info)
                     {
-                        <td><button type="button" class="btn btn-success" @onclick="() => OnClickAddInBase(info)">Send file</button></td>
+                        <td><input value="@singleton.thisProject.DocumentsDesigner.Find(x => x.Name == info).Text" disabled/></td>
                     }
-                    else
+
+                    @if (info == onChangeRow)
                     {
-                        <td></td>
-                    }
-                    @if (singleton.thisProject.DocumentsDeveloper.Find(x => x.Name == info) != null
-                    && singleton.thisProject.DocumentsDeveloper.Find(x => x.Name == info).Name == info 
-                    || files.Find(x => x.Name == info) != null && files.Find(x => x.Name == info).Name == info)
-                    {
-                        <td><button type="button" class="btn btn-warning" @onclick="() => OnDeleteClick(info)">Delete file</button></td>
+                        <td><button class="btn btn-success" @onclick="() => BtnSave(info)">Save</button></td>
                     }
                     else
                     {
                         <td></td>
+                    }
+                    @if (singleton.thisProject.DocumentsDesigner.Find(x => x.Name == info) != null
+                   && singleton.thisProject.DocumentsDesigner.Find(x => x.Name == info).Name == info)
+                    {
+                        <td><button class="btn btn-warning" @onclick="() => BtnDelete(info)">Delete</button></td>
                     }
                 </tr>
             }
@@ -56,62 +56,34 @@
 
 
 @code {
-    List<ListAddFiles> files = new();
-    string nameRow = string.Empty;
-    private string stringPath = string.Empty;
-    private string fileName = string.Empty;
+    string txtInfo = string.Empty;
+    string onChangeRow = string.Empty;
 
-    protected override void OnInitialized()
+    private void BtnOnChangeClick(string nameRow)
     {
+        onChangeRow = nameRow;
+        var temp = singleton.thisProject.DocumentsDesigner.Find(x => x.Name == nameRow);
+        if (temp == null) txtInfo = "";
+        else txtInfo = temp.Text;
     }
 
-    private void OnDeleteClick(string name)
+    private void BtnSave(string nameRow)
     {
-        var tempFileThis = files.Find(x => x.Name == name);
-        if (tempFileThis != null) files.Remove(tempFileThis);
-        var tempFileSingleton = singleton.thisProject.DocumentsDeveloper.Find(x => x.Name == name);
-        if (tempFileSingleton != null)
+        var temp = singleton.thisProject.DocumentsDesigner.Find(x => x.Name == nameRow);
+        if (temp != null)
         {
-            singleton.thisProject.DocumentsDeveloper.Remove(tempFileSingleton);
-            MongoExamples.ReplaceProjectById(singleton.thisProject._id, singleton.thisProject);
+            singleton.thisProject.DocumentsDesigner.Remove(temp);
         }
+        singleton.thisProject.DocumentsDesigner.Add(new DocumentDesigner(onChangeRow, txtInfo));
+        MongoExamples.ReplaceProjectById(singleton.thisProject._id, singleton.thisProject);
+        onChangeRow = string.Empty;
+        txtInfo = string.Empty;
     }
 
-    private void OnDowloadClick(string rowName)
+    private void BtnDelete(string nameRow)
     {
-        ///////////-------------------
-    }
-
-    private void OnClickInputFile(string rowName)
-    {
-        if (nameRow != rowName) nameRow = rowName;
-    }
-
-    private void OnInputFileChange(InputFileChangeEventArgs e)
-    {
-        foreach (var file in e.GetMultipleFiles(1))
-        {
-            if (files.Find(x => x.Name == nameRow) == null) 
-                files.Add(new ListAddFiles(nameRow, file));
-        }
-    }
-
-    private async Task OnClickAddInBase(string rowName)
-    {
-        var file = files.Find(x => x.Name == rowName);
-
-        Stream stream = file.File.OpenReadStream(100000000000);
-        stringPath = $"{env.WebRootPath}\\Files\\{file.File.Name}";
-        fileName = file.File.Name;
-        FileStream fs = File.Create(stringPath);
-        await stream.CopyToAsync(fs);
-        stream.Close();
-        fs.Close();
-
-        await FileSystemService.UploadFileToDb(stringPath, fileName);
-        files.Remove(file);
-        singleton.thisProject.DocumentsDeveloper.Add(new DocumentDeveloper(FileSystemService.SearchByNameId(fileName), rowName));
+        var temp = singleton.thisProject.DocumentsDesigner.Find(x => x.Name == nameRow);
+        singleton.thisProject.DocumentsDesigner.Remove(temp);
         MongoExamples.ReplaceProjectById(singleton.thisProject._id, singleton.thisProject);
     }
-
 }
