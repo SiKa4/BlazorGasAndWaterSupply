@@ -16,60 +16,42 @@
 
 @if (!singleton.user.FilledIn && singleton.user.Department != "Customer" || singleton.user.Department != "Customer" && clickRef)
 {
-    <EditForm Model="singleton.user" OnValidSubmit="Submit">
+
+    <EditForm Model="@thisUserModel" OnValidSubmit="Submit">
+        <ValidationSummary />
+        <DataAnnotationsValidator />
+
         <div class="row g-0">
             <div class="col-sm-6 col-md-8">
                 <label>Phone number:</label>
-                <InputMask @bind-Value="phoneNumber" class="form-control" data-mask="+7(000)-000-00-00" placeholder="Phone..." />
-            </div>
-            <div class="col-6 col-md-4">
-                @if (!ErrorParseInt(phoneNumber, 17)){<h2><span class="badge bg-secondary">Error</span></h2>}
+                <InputMask @bind-Value="thisUserModel.PhoneNumber" class="form-control" data-mask="+7(000)-000-00-00" placeholder="Phone..." />
             </div>
             <div class="col-sm-6 col-md-8">
                 <label>Email</label>
-                <InputText @bind-Value="email" class="form-control" placeholder="Email..." />
-            </div>
-            <div class="col-6 col-md-4">
-                @if (!email.Contains('@')){ <h2><span class="badge bg-secondary">Error</span></h2> }
+                <InputText @bind-Value="thisUserModel.Email" class="form-control" placeholder="Email..." />
             </div>
             <div class="col-sm-6 col-md-8">
                 <label>Organization</label>
-                <InputText @bind-Value="organization" class="form-control" placeholder="Organization..." />
-            </div>
-            <div class="col-6 col-md-4">
-                @if (organization.Length < 10){ <h2><span class="badge bg-secondary">Error</span></h2> }
+                <InputText @bind-Value="thisUserModel.Organization" class="form-control" placeholder="Organization..." />
             </div>
             <div class="col-sm-6 col-md-8">
                 <label>OGRN</label>
-                <InputMask @bind-Value="ogrn" class="form-control" data-mask="0000000000000" placeholder="OGRN..." />
-            </div>
-            <div class="col-6 col-md-4">
-                @if (!ErrorParseInt(ogrn, 13)){ <h2><span class="badge bg-secondary">Error</span></h2> }
+                <InputMask @bind-Value="thisUserModel.OGRN" class="form-control" data-mask="0000000000000" placeholder="OGRN..." />
             </div>
             <div class="col-sm-6 col-md-8">
                 <label>INN</label>
-                <InputMask @bind-Value="inn" class="form-control" data-mask="0000000000" placeholder="INN..." />
-            </div>
-            <div class="col-6 col-md-4">
-                @if (!ErrorParseInt(inn, 10)){ <h2><span class="badge bg-secondary">Error</span></h2> }
+                <InputMask @bind-Value="thisUserModel.INN" class="form-control" data-mask="0000000000" placeholder="INN..." />
             </div>
             <div class="col-sm-6 col-md-8">
                 <label>KPP</label>
-                <InputMask @bind-Value="kpp" class="form-control" data-mask="000000000" placeholder="KPP..."/>
-            </div>
-            <div class="col-6 col-md-4">
-                @if (!ErrorParseInt(kpp, 9)){ <h2><span class="badge bg-secondary">Error</span></h2> }
+                <InputMask @bind-Value="thisUserModel.KPP" class="form-control" data-mask="000000000" placeholder="KPP..." />
             </div>
             <div class="col-sm-6 col-md-8">
                 <label>Adress</label>
-                <InputText @bind-Value="adress" class="form-control" placeholder="Adress..." />
-            </div>
-            <div class="col-6 col-md-4">
-                @if (adress.Length < 10){ <h2><span class="badge bg-secondary">Error</span></h2> }
+                <InputText @bind-Value="thisUserModel.Adress" class="form-control" placeholder="Adress..." />
             </div>
         </div>
-        <ValidationSummary />
-        <DataAnnotationsValidator />
+        
     </EditForm>
     <div class="mb-3">
         <InputFile OnChange="@OnInputFileChange" multiple />
@@ -87,21 +69,15 @@ else if (singleton.user.Department != "Customer")
     <h4>KPP : @singleton.user.KPP</h4>
 }
 else if (singleton.user.Department == "Customer" && !singleton.user.FilledIn || singleton.user.Department == "Customer" && clickRef)
-{ <EditForm Model="singleton.user" OnValidSubmit="Submit">
+{ <EditForm Model="thisUserModel" OnValidSubmit="Submit">
         <div class="row g-0">
                 <div class="col-sm-6 col-md-8">
                     <label>Phone number:</label>
-                    <InputMask @bind-Value="phoneNumber" class="form-control" data-mask="+7(000)-000-00-00" placeholder="Phone..." />
-                </div>
-                <div class="col-6 col-md-4">
-                    @if (!ErrorParseInt(phoneNumber, 17)){<h2><span class="badge bg-secondary">Error</span></h2>}
+                <InputMask @bind-Value="thisUserModel.PhoneNumber" class="form-control" data-mask="+7(000)-000-00-00" placeholder="Phone..." />
                 </div>
                 <div class="col-sm-6 col-md-8">
                     <label>Email</label>
-                    <InputText @bind-Value="email" class="form-control" placeholder="Email..." />
-                </div>
-                <div class="col-6 col-md-4">
-                    @if (!email.Contains('@')){ <h2><span class="badge bg-secondary">Error</span></h2> }
+                <InputText @bind-Value="thisUserModel.Email" class="form-control" placeholder="Email..." />
                 </div>
         </div>
         <ValidationSummary />
@@ -132,15 +108,7 @@ else if(singleton.user.Department == "Customer")
 
 
 @code {
-
-    private string phoneNumber = string.Empty;
-    private string email = string.Empty;
-    private string adress = string.Empty;
-    private string inn = string.Empty;
-    private string kpp = string.Empty;
-    private string ogrn = string.Empty;
-    private string organization = string.Empty;
-
+    User thisUserModel;
     private string stringPath = string.Empty;
     private string fileName = string.Empty;
     private string photoPath = string.Empty;
@@ -150,6 +118,7 @@ else if(singleton.user.Department == "Customer")
 
     protected override void OnInitialized()
     {
+        thisUserModel = singleton.user;
         if(singleton.user._idPhoto != new ObjectId())
         {
             PhotoSystemService.DownloadToLocal(env.WebRootPath, singleton.user);
@@ -165,26 +134,26 @@ else if(singleton.user.Department == "Customer")
 
     private async Task BtnSave()
     {
-        if (stringPath != string.Empty && phoneNumber.Length == 17 && email.Contains('@') == true && ErrorParseInt(inn, 10)
-            && ErrorParseInt(kpp, 9) && ErrorParseInt(ogrn, 13) && organization.Length >= 10 && adress.Length >= 10)
-        {
-            clickRef = !clickRef;
-            singleton.user.TopUp(email, phoneNumber, ogrn, inn, kpp, adress, organization);
-            await PhotoSystemService.UploadImageToDb(stringPath, fileName, singleton.user);
-            photoPath = $"\\Images\\{PhotoSystemService.GetNameInDb(singleton.user)}";
-            wasSubmitted = true;
-            MongoExamples.ReplaceById(singleton.user._id, singleton.user);
-        }
-        else if (stringPath != string.Empty && phoneNumber.Length == 17 && email.Contains('@') == true 
-        && singleton.user.Department == "Customer")
-        {
-            clickRef = !clickRef;
-            singleton.user.TopUp(email, phoneNumber);
-            await PhotoSystemService.UploadImageToDb(stringPath, fileName, singleton.user);
-            photoPath = $"\\Images\\{PhotoSystemService.GetNameInDb(singleton.user)}";
-            wasSubmitted = true;
-            MongoExamples.ReplaceById(singleton.user._id, singleton.user);
-        }
+        //if (stringPath != string.Empty && phoneNumber.Length == 17 && email.Contains('@') == true && ErrorParseInt(inn, 10)
+        //    && ErrorParseInt(kpp, 9) && ErrorParseInt(ogrn, 13) && organization.Length >= 10 && adress.Length >= 10)
+        //{
+        //    clickRef = !clickRef;
+        //    singleton.user.TopUp(email, phoneNumber, ogrn, inn, kpp, adress, organization);
+        //    await PhotoSystemService.UploadImageToDb(stringPath, fileName, singleton.user);
+        //    photoPath = $"\\Images\\{PhotoSystemService.GetNameInDb(singleton.user)}";
+        //    wasSubmitted = true;
+        //    MongoExamples.ReplaceById(singleton.user._id, singleton.user);
+        //}
+        //else if (stringPath != string.Empty && phoneNumber.Length == 17 && email.Contains('@') == true 
+        //&& singleton.user.Department == "Customer")
+        //{
+        //    clickRef = !clickRef;
+        //    singleton.user.TopUp(email, phoneNumber);
+        //    await PhotoSystemService.UploadImageToDb(stringPath, fileName, singleton.user);
+        //    photoPath = $"\\Images\\{PhotoSystemService.GetNameInDb(singleton.user)}";
+        //    wasSubmitted = true;
+        //    MongoExamples.ReplaceById(singleton.user._id, singleton.user);
+        //}
     }
 
     private void OnInputFileChange(InputFileChangeEventArgs e)
@@ -207,8 +176,8 @@ else if(singleton.user.Department == "Customer")
         }
     }
 
-    bool wasSubmitted;
-    bool clickRef;
+    bool wasSubmitted = false;
+    bool clickRef = true;
 
     private void clickRefBtn()
     {
@@ -218,13 +187,7 @@ else if(singleton.user.Department == "Customer")
 
     private void Submit()
     {
-        wasSubmitted = true;
+        wasSubmitted = !wasSubmitted;
     }
-
-    private bool ErrorParseInt(string value, int quantity) 
-    { 
-        return true ? value.Length == quantity : false; 
-    }
-
 }
 

@@ -1,6 +1,7 @@
 ﻿using BlazorGasAndWaterSupply.Data;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using System.ComponentModel.DataAnnotations;
 
 namespace BlazorContolWork.Data
 {
@@ -18,21 +19,42 @@ namespace BlazorContolWork.Data
         public string Surname { get; set; }
         public string Login { get; set; }
         public string Password { get; set; }
+
         [BsonIgnoreIfDefault]
+        [Required]
+        [RegularExpression(@"^((?!\.)[\w-_.]*[^.])(@\w+)(\.\w+(\.\w+)?[^.\W])$", ErrorMessage = "Wrong Email.")]
         public string Email { get; set; }
+
         [BsonIgnoreIfDefault]
+        [Required]
         public string Department { get; set; }
+
         [BsonIgnoreIfDefault]
+        [Required]
+        [RegularExpression(@"^[+][0-9][(][0-9]{3}[)][-][0-9]{3}[-][0-9]{2}[-][0-9]{2}$", ErrorMessage = "Invalid phone number.")]
         public string PhoneNumber { get; set; }
+
         [BsonIgnoreIfDefault]
+        [Required]
+        [RegularExpression(@"^[0-9]{13}$", ErrorMessage = "Invalid OGRN.")]
         public string OGRN { get; set; }
+
         [BsonIgnoreIfDefault]
+        [Required]
+        [RegularExpression(@"^[0-9]{10}$", ErrorMessage = "Invalid INN.")]
         public string INN { get; set; }
+
         [BsonIgnoreIfDefault]
+        [Required]
+        [RegularExpression(@"^[0-9]{9}", ErrorMessage = "Invalid KPP.")]
         public string KPP { get; set; }
+
         [BsonIgnoreIfDefault]
+        [Required]
         public string Adress { get; set; }
+
         [BsonIgnoreIfDefault]
+        [Required]
         public string Organization { get; set; }
 
         public bool FilledIn { get; set; }
