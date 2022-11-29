@@ -1,15 +1,17 @@
 ﻿@page "/pagefileinsertdev"
+@using System.IO
 @using MongoDB.Bson
 @inject SingletonServices singleton
 @inject NavigationManager NavigationManager
 @inject IWebHostEnvironment env
+@inject IJSRuntime JS
 
 <h3 class="text-center">File Developer</h3>
 
 
 <p class="text-center fw-bold mb-5 mx-1 mx-md-4 mt-4">
     <table class="table table-bordered">
-        <thead class="alert-dark">
+        <thead class="thead-dark">
             <tr>
                 <th>Name</th>
                 <th>Add file</th>
@@ -19,40 +21,78 @@
             </tr>
         </thead>
         <tbody>
+
             @foreach (var info in StringNameClass.returnArrayDev(singleton.thisProject.TypeProject))
             {
-                <tr>
-                    <td>@info</td>
-                    <td><InputFile OnChange="@OnInputFileChange" @onclick="() => OnClickInputFile(info)" /></td>
+                @if (singleton.thisProject.DocumentsDeveloper.Find(x => x.Name == info) != null
+               && singleton.thisProject.DocumentsDeveloper.Find(x => x.Name == info).IsOk == true)
+                {
+                    <tr class="table-success">
+                        <td>@info</td>
+                        <td><InputFile OnChange="@OnInputFileChange" @onclick="() => OnClickInputFile(info)" /></td>
 
-                    @if (singleton.thisProject.DocumentsDeveloper.Find(x => x.Name == info) != null
-                    && singleton.thisProject.DocumentsDeveloper.Find(x => x.Name == info).Name == info)
-                    {
-                        <td><button type="button" class="btn btn-warning" @onclick="() => OnDowloadClick(info)">Download Files</button></td>
-                    }
-                    @if (files.Find(x => x.Name == info) != null && files.Find(x => x.Name == info).Name == info)
-                    {
-                        <td><button type="button" class="btn btn-success" @onclick="() => OnClickAddInBase(info)">Send file</button></td>
-                    }
-                    else
-                    {
-                        <td></td>
-                    }
-                    @if (singleton.thisProject.DocumentsDeveloper.Find(x => x.Name == info) != null
-                    && singleton.thisProject.DocumentsDeveloper.Find(x => x.Name == info).Name == info 
-                    || files.Find(x => x.Name == info) != null && files.Find(x => x.Name == info).Name == info)
-                    {
-                        <td><button type="button" class="btn btn-warning" @onclick="() => OnDeleteClick(info)">Delete file</button></td>
-                    }
-                    else
-                    {
-                        <td></td>
-                    }
-                </tr>
+                        @if (singleton.thisProject.DocumentsDeveloper.Find(x => x.Name == info) != null
+                       && singleton.thisProject.DocumentsDeveloper.Find(x => x.Name == info).Name == info)
+                        {
+                            <td><button type="button" class="btn btn-warning" @onclick="() => OnDowloadClick(info)">Download Files</button></td>
+                        }
+                        @if (files.Find(x => x.Name == info) != null && files.Find(x => x.Name == info).Name == info)
+                        {
+                            <td><button type="button" class="btn btn-success" @onclick="() => OnClickAddInBase(info)">Send file</button></td>
+                        }
+                        else
+                        {
+                            <td></td>
+                        }
+                        @if (singleton.thisProject.DocumentsDeveloper.Find(x => x.Name == info) != null
+                       && singleton.thisProject.DocumentsDeveloper.Find(x => x.Name == info).Name == info
+                       || files.Find(x => x.Name == info) != null && files.Find(x => x.Name == info).Name == info)
+                        {
+                            <td><button type="button" class="btn btn-warning" @onclick="() => OnDeleteClick(info)">Delete file</button></td>
+                        }
+                        else
+                        {
+                            <td></td>
+                        }
+                    </tr>
+                }
+                else
+                {
+                    <tr>
+                        <td>@info</td>
+                        <td><InputFile OnChange="@OnInputFileChange" @onclick="() => OnClickInputFile(info)" /></td>
+
+                        @if (singleton.thisProject.DocumentsDeveloper.Find(x => x.Name == info) != null
+                       && singleton.thisProject.DocumentsDeveloper.Find(x => x.Name == info).Name == info)
+                        {
+                            <td><button type="button" class="btn btn-warning" @onclick="() => OnDowloadClick(info)">Download Files</button></td>
+                        }
+                        @if (files.Find(x => x.Name == info) != null && files.Find(x => x.Name == info).Name == info)
+                        {
+                            <td><button type="button" class="btn btn-success" @onclick="() => OnClickAddInBase(info)">Send file</button></td>
+                        }
+                        else
+                        {
+                            <td></td>
+                        }
+                        @if (singleton.thisProject.DocumentsDeveloper.Find(x => x.Name == info) != null
+                       && singleton.thisProject.DocumentsDeveloper.Find(x => x.Name == info).Name == info
+                       || files.Find(x => x.Name == info) != null && files.Find(x => x.Name == info).Name == info)
+                        {
+                            <td><button type="button" class="btn btn-warning" @onclick="() => OnDeleteClick(info)">Delete file</button></td>
+                        }
+                        else
+                        {
+                            <td></td>
+                        }
+                    </tr>
+                }
+                
             }
         </tbody>
     </table>
 </p>
+
 
 
 @code {
@@ -77,9 +117,14 @@
         }
     }
 
-    private void OnDowloadClick(string rowName)
+    private async Task OnDowloadClick(string rowName)
     {
-        ///////////-------------------
+        var temp = singleton.thisProject.DocumentsDeveloper.Find(x => x.Name == rowName);
+        var stream = FileSystemService.DownloadToLocal(temp._idFile);
+
+        using var streamRef = new DotNetStreamReference(stream: stream);
+
+        await JS.InvokeVoidAsync("downloadFileFromStream", FileSystemService.NameDownloadFile(temp._idFile), streamRef);
     }
 
     private void OnClickInputFile(string rowName)

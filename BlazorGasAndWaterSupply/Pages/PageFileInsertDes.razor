@@ -21,34 +21,70 @@
         <tbody>
             @foreach (var info in StringNameClass.returnArrayDes(singleton.thisProject.TypeProject))
             {
-                <tr>
-                    <td>@info</td>
-                    <td><button class="btn btn-success" @onclick="() => BtnOnChangeClick(info)">Change</button></td>
+                @if (singleton.thisProject.DocumentsDesigner.Find(x => x.Name == info) != null
+               && singleton.thisProject.DocumentsDesigner.Find(x => x.Name == info).IsOk == true)
+                {
+                    <tr class="table-success">
+                        <td>@info</td>
+                        <td><button class="btn btn-success" @onclick="() => BtnOnChangeClick(info)">Change</button></td>
 
-                    @if (onChangeRow == info)
-                    {
-                        <td><input @bind="@txtInfo"/></td>
-                    }
-                    else if (singleton.thisProject.DocumentsDesigner.Find(x => x.Name == info) != null
-                    && singleton.thisProject.DocumentsDesigner.Find(x => x.Name == info).Name == info)
-                    {
-                        <td><input value="@singleton.thisProject.DocumentsDesigner.Find(x => x.Name == info).Text" disabled/></td>
-                    }
+                        @if (onChangeRow == info)
+                        {
+                            <td><input @bind="@txtInfo" /></td>
+                        }
+                        else if (singleton.thisProject.DocumentsDesigner.Find(x => x.Name == info) != null
+                        && singleton.thisProject.DocumentsDesigner.Find(x => x.Name == info).Name == info)
+                        {
+                            <td><input value="@singleton.thisProject.DocumentsDesigner.Find(x => x.Name == info).Text" disabled /></td>
+                        }
 
-                    @if (info == onChangeRow)
-                    {
-                        <td><button class="btn btn-success" @onclick="() => BtnSave(info)">Save</button></td>
-                    }
-                    else
-                    {
-                        <td></td>
-                    }
-                    @if (singleton.thisProject.DocumentsDesigner.Find(x => x.Name == info) != null
-                   && singleton.thisProject.DocumentsDesigner.Find(x => x.Name == info).Name == info)
-                    {
-                        <td><button class="btn btn-warning" @onclick="() => BtnDelete(info)">Delete</button></td>
-                    }
-                </tr>
+                        @if (info == onChangeRow)
+                        {
+                            <td><button class="btn btn-success" @onclick="() => BtnSave(info)">Save</button></td>
+                        }
+                        else
+                        {
+                            <td></td>
+                        }
+                        @if (singleton.thisProject.DocumentsDesigner.Find(x => x.Name == info) != null
+                       && singleton.thisProject.DocumentsDesigner.Find(x => x.Name == info).Name == info)
+                        {
+                            <td><button class="btn btn-warning" @onclick="() => BtnDelete(info)">Delete</button></td>
+                        }
+                    </tr>
+                }
+                else
+                {
+                    <tr>
+                        <td>@info</td>
+                        <td><button class="btn btn-success" @onclick="() => BtnOnChangeClick(info)">Change</button></td>
+
+                        @if (onChangeRow == info)
+                        {
+                            <td><input @bind="@txtInfo" /></td>
+                        }
+                        else if (singleton.thisProject.DocumentsDesigner.Find(x => x.Name == info) != null
+                        && singleton.thisProject.DocumentsDesigner.Find(x => x.Name == info).Name == info)
+                        {
+                            <td><input value="@singleton.thisProject.DocumentsDesigner.Find(x => x.Name == info).Text" disabled /></td>
+                        }
+
+                        @if (info == onChangeRow)
+                        {
+                            <td><button class="btn btn-success" @onclick="() => BtnSave(info)">Save</button></td>
+                        }
+                        else
+                        {
+                            <td></td>
+                        }
+                        @if (singleton.thisProject.DocumentsDesigner.Find(x => x.Name == info) != null
+                       && singleton.thisProject.DocumentsDesigner.Find(x => x.Name == info).Name == info)
+                        {
+                            <td><button class="btn btn-warning" @onclick="() => BtnDelete(info)">Delete</button></td>
+                        }
+                    </tr>
+                }
+                
             }
         </tbody>
     </table>

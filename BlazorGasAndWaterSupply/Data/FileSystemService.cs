@@ -30,5 +30,30 @@ namespace BlazorContolWork.Data
             var fileInfos = gridFS.Find(filter).FirstOrDefault();
             return fileInfos.Id;
         }
+
+        static public Stream DownloadToLocal(ObjectId _id)
+        {
+            var client = new MongoClient();
+            var database = client.GetDatabase("DBUser");
+            var gridFS = new GridFSBucket(database);
+            var temp = gridFS.OpenDownloadStream(_id);
+            return temp;
+        }
+
+        static public string NameDownloadFile(ObjectId _id)
+        {
+            var client = new MongoClient();
+            var database = client.GetDatabase("DBUser");
+            var gridFS = new GridFSBucket(database);
+
+            var filter = Builders<GridFSFileInfo>.Filter.Eq("_id", _id);
+            string fileNames = string.Empty;
+
+            using (var cursor = gridFS.Find(filter))
+            {
+                fileNames = cursor.FirstOrDefault().Filename;
+            }
+            return fileNames;
+        }
     }
 }

@@ -2,7 +2,7 @@
 @using MongoDB.Bson
 @inject SingletonServices singleton
 @inject NavigationManager NavigationManager
-
+@inject IJSRuntime JS
 <h3 class="text-center">Documents Developer : @MongoExamples.FindId(singleton.thisProject._idDeveloper).Name @MongoExamples.FindId(singleton.thisProject._idDeveloper).Surname</h3>
 
 <p class="text-center fw-bold mb-5 mx-1 mx-md-4 mt-4">
@@ -22,8 +22,8 @@
                     @if (singleton.thisProject.DocumentsDeveloper.Find(x => x.Name == info) != null &&
                     singleton.thisProject.DocumentsDeveloper.Find(x => x.Name == info).Name == info)
                     {
-                        <td><button type="button" class="btn btn-warning">Download Files</button></td>
-                        <td><input type="checkbox" @bind="@singleton.thisProject.DocumentsDeveloper.Find(x => x.Name == info).IsOk" @onclick="() => CheckboxClicked(info)" /></td>
+                        <td><button type="button" class="btn btn-warning" @onclick="() => OnDowloadClick(info)">Download Files</button></td>
+                        <td><input type="checkbox" @bind="@singleton.thisProject.DocumentsDeveloper.Find(x => x.Name == info).IsOk" @onclick="() => CheckboxClickedDev(info)" /></td>
                     }
                     else
                     {
@@ -36,11 +36,60 @@
     </table>
 </p>
 
+<h3 class="text-center">Documents Designer : @MongoExamples.FindId(singleton.thisProject._idDesigner).Name @MongoExamples.FindId(singleton.thisProject._idDesigner).Surname</h3>
+
+<p class="text-center fw-bold mb-5 mx-1 mx-md-4 mt-4">
+    <table class="table table-bordered">
+        <thead class="alert-dark">
+            <tr>
+                <th>Name</th>
+                <th>Info</th>
+                <th>Fit</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var info in StringNameClass.returnArrayDes(singleton.thisProject.TypeProject))
+            {
+                <tr>
+                    <td>@info</td>
+                    @if (singleton.thisProject.DocumentsDesigner.Find(x => x.Name == info) != null &&
+                   singleton.thisProject.DocumentsDesigner.Find(x => x.Name == info).Name == info)
+                    {
+                        <td><input value="@singleton.thisProject.DocumentsDesigner.Find(x => x.Name == info).Text" disabled/></td>
+                        <td><input type="checkbox" @bind="@singleton.thisProject.DocumentsDesigner.Find(x => x.Name == info).IsOk" @onclick="() => CheckboxClickedDes(info)" /></td>
+                    }
+                    else
+                    {
+                        <td>Info not found</td>
+                        <td></td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+</p>
+
 
 @code {
-    public void CheckboxClicked(string rowName)
+    public void CheckboxClickedDev(string rowName)
     {
         singleton.thisProject.DocumentsDeveloper.Find(x => x.Name == rowName).IsOk = !singleton.thisProject.DocumentsDeveloper.Find(x => x.Name == rowName).IsOk;
         MongoExamples.ReplaceProjectById(singleton.thisProject._id, singleton.thisProject);
+    }
+
+    public void CheckboxClickedDes(string rowName)
+    {
+        singleton.thisProject.DocumentsDesigner.Find(x => x.Name == rowName).IsOk = !singleton.thisProject.DocumentsDesigner.Find(x => x.Name == rowName).IsOk;
+        MongoExamples.ReplaceProjectById(singleton.thisProject._id, singleton.thisProject);
+    }
+
+    private async Task OnDowloadClick(string rowName)
+    {
+        var temp = singleton.thisProject.DocumentsDeveloper.Find(x => x.Name == rowName);
+        var stream = FileSystemService.DownloadToLocal(temp._idFile);
+
+        using var streamRef = new DotNetStreamReference(stream: stream);
+
+        await JS.InvokeVoidAsync("downloadFileFromStream", FileSystemService.NameDownloadFile(temp._idFile), streamRef);
     }
 }
