@@ -34,6 +34,13 @@ namespace BlazorContolWork.Data
             collectionProject.InsertOne(project);
         }
 
+        public static void DeleteProjectInDb(Project project)
+        {
+            IMongoCollection<Project> collectionProject = database.GetCollection<Project>("Projects");
+            collectionProject.DeleteOne(x => x._id == project._id);
+        }
+
+
         public static List<Project> SearchProjectCustomer(ObjectId _id)
         {
             IMongoCollection<Project> collectionProject = database.GetCollection<Project>("Projects");

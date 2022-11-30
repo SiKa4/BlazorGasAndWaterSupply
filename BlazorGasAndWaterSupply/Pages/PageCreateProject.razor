@@ -2,6 +2,7 @@
 @using BlazorGasAndWaterSupply.Data
 @using MongoDB.Bson
 @inject SingletonServices singleton
+@inject NavigationManager NavigationManager
 @using MongoDB.Bson.Serialization.Attributes;
 
 
@@ -100,10 +101,11 @@
 
     private void BtnClick()
     {
-        if(loginDesigner != string.Empty && loginDeveloper != string.Empty && name != string.Empty)
+        if(loginDesigner != string.Empty && loginDeveloper != string.Empty && name != string.Empty && singleton.user.Department == "Customer")
         {
             Project temp = new Project(name, MongoExamples.FindLog(loginDeveloper)._id, MongoExamples.FindLog(loginDesigner)._id, singleton.user._id);
             MongoExamples.AddToDbProject(temp);
+            NavigationManager.NavigateTo("/pagecustomer");
         }
     }
 }

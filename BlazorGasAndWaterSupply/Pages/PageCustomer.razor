@@ -24,6 +24,7 @@ else
                     <th>Designer</th>
                     <th>Type project</th>
                     <th></th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
@@ -35,6 +36,7 @@ else
                         <td>@MongoExamples.FindId(project._idDesigner).Name @MongoExamples.FindId(project._idDesigner).Surname</td>
                         <td>@singleton.user.TypeProject</td>
                         <td><button type="button" class="btn btn-success" @onclick="() => OnClickBtn(project)">Open project</button></td>
+                        <td><button type="button" class="btn btn-warning" @onclick="() => OnClickBtnDel(project)">Delete project</button></td>
                     </tr>
                 }
             </tbody>
@@ -51,5 +53,10 @@ else
     private void OnClickButton()
     {
         NavigationManager.NavigateTo("/pagecreateproject");
+    }
+
+    private void OnClickBtnDel(Project project)
+    {
+        MongoExamples.DeleteProjectInDb(project);
     }
 }
