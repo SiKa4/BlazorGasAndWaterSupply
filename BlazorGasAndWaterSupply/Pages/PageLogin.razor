@@ -33,10 +33,7 @@
             <div class="pt-1 mb-4">
               <button class="btn btn-info btn-lg btn-block" @onclick="LogClick" type="button">Login</button>
             </div>
-            @if(error)
-                        {
-                            <h6 class="btn-danger">Error</h6>
-                        }
+            <h6 class="btn-danger">@errorAuth</h6>
 
             <p class="small mb-5 pb-lg-2"><a class="text-muted" href="#!">Forgot password?</a></p>
             <p>Don't have an account? <a href="#!" class="link-info">Register here</a></p>
@@ -57,20 +54,34 @@
     string userLogin = string.Empty;
     string userPassword = string.Empty;
     bool error = false;
-    private void LogClick()
+    string errorAuth = "";
+
+    private async void LogClick()
     {
-        
+        errorAuth = "Идет поиск, подождите!!!";
         var temp = MongoExamples.FindLogPass(userLogin, userPassword);
         if(temp != null)
         {
-            singleton.LogIn = true;
-            singleton.user = temp;
-            NavigationManager.NavigateTo("/");
+            AuthImetation(temp);
         }
         else
         {
             error = true;
+            errorAuth = "Не найдет!!!";
         }
+    }
+
+    //private async Task Print()
+    //{
+    //    errorAuth = "Идет поиск, подождите!!!";
+    //}
+
+    private async Task AuthImetation(User user)
+    {
+        await Task.Delay(3000);
+        singleton.LogIn = true;
+        singleton.user = user;
+        NavigationManager.NavigateTo("/");
     }
 
 }
