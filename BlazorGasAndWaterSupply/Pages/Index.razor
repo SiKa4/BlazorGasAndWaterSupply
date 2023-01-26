@@ -1,4 +1,5 @@
 ﻿@page "/"
+@using Microsoft.AspNetCore.SignalR.Client
 @inject SingletonServices singleton
 <PageTitle>Index</PageTitle>
 @if(singleton.LogIn)
@@ -10,4 +11,53 @@ else
 {
     <h1>Hello, user!</h1>
     <h3>Try to register or log in to your profile!</h3>
+}
+<div class="input-group input-group-sm mb-3">
+  <div class="input-group-prepend">
+    <span class="input-group-text" id="inputGroup-sizing-sm">Message</span>
+  </div>
+  <input type="text" class="form-control" aria-describedby="inputGroup-sizing-sm" @bind-value="message">
+</div>
+<button class="btn btn-primary" type="submit" @onclick="SendBtn">Send</button>
+
+@foreach (var i in messages)
+{
+    <h1>@i</h1>
+}
+
+@code 
+{
+    string message;
+    HubConnection connection;
+    List<string> messages = new List<string>();
+
+    protected override void OnInitialized()
+    { 
+        connection = new HubConnectionBuilder()
+                .WithUrl("https://localhost:7283//chat")
+                .Build();
+
+        //connection.On<string, string>("Receive", ("213", message) =>
+        //    {
+        //        Dispatcher.InvokeAsync(() =>
+        //        {
+        //            var newMessage = $"123: {message}";
+        //            messages.Add(newMessage);
+        //        });
+        //    });
+    }
+
+
+    private async void SendBtn()
+    {
+        try
+        {
+            await connection.InvokeAsync("Send", "000", message);
+        }
+        catch (Exception ex)
+        {
+            messages.Add(ex.Message);
+        }
+    }
+
 }

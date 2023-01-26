@@ -1,6 +1,7 @@
 using BlazorContolWork.Data;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using WebApplication2;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,4 +29,14 @@ app.UseRouting();
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
 
+app.Run();
+
+
+builder.Services.AddSignalR();
+
+
+app.UseDefaultFiles();
+app.UseStaticFiles();
+
+app.MapHub<ChatHub>("/chat");
 app.Run();
