@@ -75,6 +75,13 @@ namespace BlazorContolWork.Data
             return one;
         }
 
+        public static User FindLogPassCustomer(string log, string pass)
+        {
+            UpdateBase();
+            var one = collection.Find(x => x.Login == log && x.Password == pass && x.Department == "Customer").FirstOrDefault();
+            return one;
+        }
+
         public static List<User> FindUserDepartament(string departament)
         {
             UpdateBase();

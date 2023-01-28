@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BlazorContolWork.Data;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,6 +24,22 @@ namespace WpfChatCustomer
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+        private void BtnLogin_Click(object sender, RoutedEventArgs e)
+        {
+            if (txtLogin.Text != string.Empty && txtPassword.Password != string.Empty)
+            {
+                var check = MongoExamples.FindLogPassCustomer(txtLogin.Text, txtPassword.Password);
+                if (check != null)
+                {
+                    ChatWindow win = new ChatWindow(check);
+                    win.Show();
+                    App.Current.MainWindow.Close();
+                }
+                else MessageBox.Show("You entered incorrect data!!!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            else MessageBox.Show("You have not entered the data!!!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 }
