@@ -192,11 +192,15 @@
             .WithUrl(Navigation.ToAbsoluteUri("/chathub"))
             .Build();
 
-        hubConnection.On<string, string>("ReceiveMessage", (user, message) =>
+        hubConnection.On<string, string, string, string>("ReceiveMessage", (user, message, _idReceiver, _idSending) =>
         {
-            var encodedMsg = $"{singleton.user.Name}: {message}";
-            messages.Add(encodedMsg);
-            InvokeAsync(StateHasChanged);
+            if (singleton.user._id.ToString() == _idSending && _idReceiver == singleton.thisProject._idCustomer.ToString()
+                || singleton.thisProject._idCustomer.ToString() == _idSending && _idReceiver == singleton.user._id.ToString())
+            {
+                var encodedMsg = $"{singleton.user.Name}: {message}";
+                messages.Add(encodedMsg);
+                InvokeAsync(StateHasChanged);      
+            }
         });
 
         await hubConnection.StartAsync();
@@ -206,7 +210,7 @@
     {
         if (hubConnection is not null)
         {
-            await hubConnection.SendAsync("SendMessage", singleton.user.Name, messageInput);
+            await hubConnection.SendAsync("SendMessage", singleton.user.Name, messageInput, singleton.thisProject._idCustomer.ToString(), singleton.user._id.ToString());
         }
     }
 

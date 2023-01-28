@@ -19,7 +19,7 @@ namespace WpfChatCustomer
         }
 
         [BsonId]
-        ObjectId _id;
+        public ObjectId _id;
 
         public string Name { get; set; }
         public string Departament { get; set; }

@@ -1,5 +1,7 @@
 ﻿using BlazorContolWork.Data;
 using Microsoft.AspNetCore.SignalR.Client;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,13 +23,15 @@ namespace WpfChatCustomer
     /// </summary>
     public partial class ChatWindow : Window
     {
-        User user;
+        User userr;
+        [BsonId]
+        ObjectId idReceiver;
         List<ClassProjectNameDevDes> DevDesProject;
         HubConnection connection;
         public ChatWindow(User user)
         {
             InitializeComponent();
-            this.user = user;
+            this.userr = user;
             DevDesProject = new List<ClassProjectNameDevDes>();
             FillList();
             ListChatDevDes.ItemsSource = DevDesProject;
@@ -46,7 +50,7 @@ namespace WpfChatCustomer
 
         private void FillList()
         {
-            foreach(var i in MongoExamples.SearchProjectCustomer(user._id))
+            foreach(var i in MongoExamples.SearchProjectCustomer(userr._id))
             {
                 var tempDes = MongoExamples.FindId(i._idDesigner);
                 DevDesProject.Add(new ClassProjectNameDevDes(tempDes.Name, tempDes.Department, i.TypeProject, i._idDesigner));
@@ -57,16 +61,21 @@ namespace WpfChatCustomer
 
         private async void ListChatDevDes_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
+            messagesList.Items.Clear();
             ClassProjectNameDevDes temp = (ClassProjectNameDevDes)ListChatDevDes.SelectedItem;
-            if(temp != null)
+            idReceiver = temp._id;
+            if (temp != null)
             {
-                connection.On<string, string>("ReceiveMessage", (user, message) =>
+                connection.On<string, string, string, string>("ReceiveMessage", (user, message, _idReceiver, _idSending) =>
                 {
-                    this.Dispatcher.Invoke(() =>
+                    if(_idSending == userr._id.ToString() && _idReceiver == temp._id.ToString() || _idReceiver == userr._id.ToString() && _idSending == temp._id.ToString())
                     {
-                        var newMessage = $"{user}: {message}";
-                        messagesList.Items.Add(newMessage);
-                    });
+                        this.Dispatcher.Invoke(() =>
+                        {
+                            var newMessage = $"{user}: {message}";
+                            messagesList.Items.Add(newMessage);
+                        });
+                    }
                 });
 
                 try
@@ -87,7 +96,7 @@ namespace WpfChatCustomer
             try
             {
                 await connection.InvokeAsync("SendMessage",
-                    user.Name, txtMessage.Text);
+                    userr.Name, txtMessage.Text, idReceiver.ToString(), userr._id.ToString());
             }
             catch (Exception ex)
             {
