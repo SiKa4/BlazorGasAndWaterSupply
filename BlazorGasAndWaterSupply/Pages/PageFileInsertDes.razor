@@ -162,7 +162,7 @@
                 messages.Add(encodedMsg);
                 InvokeAsync(StateHasChanged);
             }
-            
+
         });
 
         await hubConnection.StartAsync();
@@ -173,6 +173,7 @@
         if (hubConnection is not null)
         {
             await hubConnection.SendAsync("SendMessage", singleton.user.Name, messageInput, singleton.thisProject._idCustomer.ToString(), singleton.user._id.ToString());
+            messageInput = string.Empty;
         }
     }
 

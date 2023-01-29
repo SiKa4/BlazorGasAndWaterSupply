@@ -97,6 +97,7 @@ namespace WpfChatCustomer
             {
                 await connection.InvokeAsync("SendMessage",
                     userr.Name, txtMessage.Text, idReceiver.ToString(), userr._id.ToString());
+                txtMessage.Text = string.Empty;
             }
             catch (Exception ex)
             {
