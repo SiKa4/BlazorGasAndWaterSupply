@@ -158,7 +158,7 @@
             if (singleton.user._id.ToString() == _idSending && _idReceiver == singleton.thisProject._idCustomer.ToString()
                 || singleton.thisProject._idCustomer.ToString() == _idSending && _idReceiver == singleton.user._id.ToString())
             {
-                var encodedMsg = $"{singleton.user.Name}: {message}";
+                var encodedMsg = $"{MongoExamples.FindId(new ObjectId(_idSending)).Name}: {message}";
                 messages.Add(encodedMsg);
                 InvokeAsync(StateHasChanged);
             }
