@@ -5,6 +5,7 @@ using MongoDB.Bson.Serialization.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.Xml;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -35,17 +36,9 @@ namespace WpfChatCustomer
             DevDesProject = new List<ClassProjectNameDevDes>();
             FillList();
             ListChatDevDes.ItemsSource = DevDesProject;
-
-
             connection = new HubConnectionBuilder()
                 .WithUrl("http://localhost:5012/ChatHub")
                 .Build();
-
-            connection.Closed += async (error) =>
-            {
-                await Task.Delay(new Random().Next(0, 5) * 1000);
-                await connection.StartAsync();
-            };
         }
 
         private void FillList()
@@ -59,16 +52,22 @@ namespace WpfChatCustomer
             }
         }
 
+
         private async void ListChatDevDes_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             messagesList.Items.Clear();
             ClassProjectNameDevDes temp = (ClassProjectNameDevDes)ListChatDevDes.SelectedItem;
             idReceiver = temp._id;
+            await connection.DisposeAsync();
+            connection = new HubConnectionBuilder()
+                .WithUrl("http://localhost:5012/ChatHub")
+                .Build();
             if (temp != null)
             {
                 connection.On<string, string, string, string>("ReceiveMessage", (user, message, _idReceiver, _idSending) =>
                 {
-                    if(_idSending == userr._id.ToString() && _idReceiver == temp._id.ToString() || _idReceiver == userr._id.ToString() && _idSending == temp._id.ToString())
+                    if(_idSending == userr._id.ToString() && _idReceiver == temp._id.ToString() 
+                    || _idReceiver == userr._id.ToString() && _idSending == temp._id.ToString())
                     {
                         this.Dispatcher.Invoke(() =>
                         {
