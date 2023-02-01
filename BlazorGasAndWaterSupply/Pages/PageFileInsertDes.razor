@@ -5,6 +5,7 @@
 @inject IWebHostEnvironment env
 @inject NavigationManager Navigation
 @implements IAsyncDisposable
+@inject IJSRuntime JsRun
 <h3 class="text-center">File Designer</h3>
 
 
@@ -90,23 +91,26 @@
         </tbody>
     </table>
 </p>
-
-<ul id="messagesList">
-    @foreach (var message in messages)
-    {
-        <li>@message</li>
-    }
-</ul>
-
+<button @onclick="OpenForm">Open chat</button>
 <hr>
 
-<div class="form-group">
-    <label>
-        Message:
-        <input @bind="messageInput" size="50" />
-    </label>
+<div class="chat-popup" id="myForm" style="display : none">
+  <form class="form-container" style="border : 2px solid black; float : right">
+    <h3>Чат c @MongoExamples.FindId(singleton.thisProject._idCustomer).Name 
+        @MongoExamples.FindId(singleton.thisProject._idCustomer).Surname</h3>
+    <div style="overflow : auto; height : 250px; border : 2px solid black; word-wrap : break-word;">
+        <ul id="messagesList">
+        @foreach (var message in messages)
+        {
+            <li style="word-wrap : break-word;">@message</li>
+        }
+        </ul>
+    </div>
+    <textarea @bind="messageInput" placeholder="Message..."></textarea>
+    <button type="button" class="btn" @onclick="Send" id="btnSend">Отправить</button>
+    <button type="button" class="btn cancel" onclick="closeForm()">Закрыть</button>
+  </form>
 </div>
-<button @onclick="Send" disabled="@(!IsConnected)">Send</button>
 
 
 @code {
@@ -145,7 +149,7 @@
 
     private HubConnection? hubConnection;
     private List<string> messages = new List<string>();
-    private string? messageInput;
+    private string? messageInput = "";
 
     protected override async Task OnInitializedAsync()
     {
@@ -160,20 +164,29 @@
             {
                 var encodedMsg = $"{MongoExamples.FindId(new ObjectId(_idSending)).Name}: {message}";
                 messages.Add(encodedMsg);
+                Task.Delay(100).Wait();
                 InvokeAsync(StateHasChanged);
             }
-
         });
 
         await hubConnection.StartAsync();
     }
 
-    private async Task Send()
+    private void OpenForm()
     {
+        JsRun.InvokeVoidAsync("openForm");
+    }
+
+    private async void Send()
+    {
+        await JsRun.InvokeVoidAsync("disabledBtn");
+        Task.Delay(50).Wait();
+        await JsRun.InvokeVoidAsync("enabledBtn");
+
         if (hubConnection is not null)
         {
             await hubConnection.SendAsync("SendMessage", singleton.user.Name, messageInput, singleton.thisProject._idCustomer.ToString(), singleton.user._id.ToString());
-            messageInput = string.Empty;
+            messageInput = "";
         }
     }
 

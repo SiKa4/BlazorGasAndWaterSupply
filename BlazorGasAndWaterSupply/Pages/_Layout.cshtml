@@ -8,6 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <base href="~/" />
+    
     <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
     <link href="css/site.css" rel="stylesheet" />
     <link href="BlazorGasAndWaterSupply.styles.css" rel="stylesheet" />
@@ -27,7 +28,7 @@
         <a class="dismiss">🗙</a>
     </div>
     <script src="_framework/blazor.server.js"></script>
-
+    <script src="~/Js/MyJs.js"></script>
     <script>
         window.downloadFileFromStream = async (fileName, contentStreamReference) => {
             const arrayBuffer = await contentStreamReference.arrayBuffer();
@@ -40,8 +41,7 @@
             anchorElement.remove();
             URL.revokeObjectURL(url);
         }
-
-
     </script>
 </body>
 </html>
+
