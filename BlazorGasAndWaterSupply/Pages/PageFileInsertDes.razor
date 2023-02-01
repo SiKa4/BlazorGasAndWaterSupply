@@ -102,7 +102,7 @@
         <ul id="messagesList">
         @foreach (var message in messages)
         {
-            <li style="word-wrap : break-word;">@message</li>
+            <li style="word-wrap : break-word;">@message.NameSending: @message.Message</li>
         }
         </ul>
     </div>
@@ -148,23 +148,23 @@
     //--signalr
 
     private HubConnection? hubConnection;
-    private List<string> messages = new List<string>();
+    private List<Messages> messages = new List<Messages>();
     private string? messageInput = "";
 
     protected override async Task OnInitializedAsync()
     {
+        messages = MongoExamples.SearchMessagesThisChat(singleton.thisProject._idCustomer, singleton.thisProject._idDesigner, singleton.thisProject._id);
         hubConnection = new HubConnectionBuilder()
             .WithUrl(Navigation.ToAbsoluteUri("/chathub"))
             .Build();
 
-        hubConnection.On<string, string, string, string>("ReceiveMessage", (user, message, _idReceiver, _idSending) =>
+        hubConnection.On<string, string, string, string, string>("ReceiveMessage", (user, message, _idReceiver, _idSending, _idProject) =>
         {
-            if (singleton.user._id.ToString() == _idSending && _idReceiver == singleton.thisProject._idCustomer.ToString()
+            if ((singleton.user._id.ToString() == _idSending && _idReceiver == singleton.thisProject._idCustomer.ToString()
                 || singleton.thisProject._idCustomer.ToString() == _idSending && _idReceiver == singleton.user._id.ToString())
+                && _idProject == singleton.thisProject._id.ToString())
             {
-                var encodedMsg = $"{MongoExamples.FindId(new ObjectId(_idSending)).Name}: {message}";
-                messages.Add(encodedMsg);
-                Task.Delay(100).Wait();
+                messages.Add(new Messages(MongoExamples.FindId(new ObjectId(_idSending)).Name, message));
                 InvokeAsync(StateHasChanged);
             }
         });
@@ -185,7 +185,8 @@
 
         if (hubConnection is not null)
         {
-            await hubConnection.SendAsync("SendMessage", singleton.user.Name, messageInput, singleton.thisProject._idCustomer.ToString(), singleton.user._id.ToString());
+            await hubConnection.SendAsync("SendMessage", singleton.user.Name, messageInput, 
+                singleton.thisProject._idCustomer.ToString(), singleton.user._id.ToString(), singleton.thisProject._id.ToString());
             messageInput = "";
         }
     }

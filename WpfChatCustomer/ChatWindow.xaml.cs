@@ -1,4 +1,5 @@
 ﻿using BlazorContolWork.Data;
+using BlazorGasAndWaterSupply.Data;
 using Microsoft.AspNetCore.SignalR.Client;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
@@ -24,15 +25,18 @@ namespace WpfChatCustomer
     /// </summary>
     public partial class ChatWindow : Window
     {
-        User userr;
+        [BsonId]
+        ObjectId _projectId;
+        User thisUser;
         [BsonId]
         ObjectId idReceiver;
         List<ClassProjectNameDevDes> DevDesProject;
         HubConnection connection;
+
         public ChatWindow(User user)
         {
             InitializeComponent();
-            this.userr = user;
+            this.thisUser = user;
             DevDesProject = new List<ClassProjectNameDevDes>();
             FillList();
             ListChatDevDes.ItemsSource = DevDesProject;
@@ -43,12 +47,22 @@ namespace WpfChatCustomer
 
         private void FillList()
         {
-            foreach(var i in MongoExamples.SearchProjectCustomer(userr._id))
+            foreach(var i in MongoExamples.SearchProjectCustomer(thisUser._id))
             {
                 var tempDes = MongoExamples.FindId(i._idDesigner);
-                DevDesProject.Add(new ClassProjectNameDevDes(tempDes.Name, tempDes.Department, i.TypeProject, i._idDesigner));
+                DevDesProject.Add(new ClassProjectNameDevDes(tempDes.Name, i.TypeProject, i.Name, i._idDesigner, i._id));
                 var tempDev = MongoExamples.FindId(i._idDeveloper);
-                DevDesProject.Add(new ClassProjectNameDevDes(tempDev.Name, tempDev.Department, i.TypeProject, i._idDeveloper));
+                DevDesProject.Add(new ClassProjectNameDevDes(tempDev.Name, i.TypeProject, i.Name, i._idDeveloper, i._id));
+            }
+        }
+
+        private void FilledMessagesInChat()
+        {
+            var temp = MongoExamples.SearchMessagesThisChat(thisUser._id, idReceiver, _projectId);
+            if (temp == null) return;
+            foreach (var i in temp)
+            {
+                messagesList.Items.Add($"{i.NameSending}: {i.Message}");
             }
         }
 
@@ -57,17 +71,20 @@ namespace WpfChatCustomer
         {
             messagesList.Items.Clear();
             ClassProjectNameDevDes temp = (ClassProjectNameDevDes)ListChatDevDes.SelectedItem;
+            _projectId = temp._idProject;
             idReceiver = temp._id;
+            FilledMessagesInChat();
             await connection.DisposeAsync();
             connection = new HubConnectionBuilder()
                 .WithUrl("http://localhost:5012/ChatHub")
                 .Build();
             if (temp != null)
             {
-                connection.On<string, string, string, string>("ReceiveMessage", (user, message, _idReceiver, _idSending) =>
+                connection.On<string, string, string, string, string>("ReceiveMessage", (user, message, _idReceiver, _idSending, _idProject) =>
                 {
-                    if(_idSending == userr._id.ToString() && _idReceiver == temp._id.ToString() 
-                    || _idReceiver == userr._id.ToString() && _idSending == temp._id.ToString())
+                    if((_idSending == thisUser._id.ToString() && _idReceiver == temp._id.ToString() 
+                    || _idReceiver == thisUser._id.ToString() && _idSending == temp._id.ToString()) 
+                    && _idProject == _projectId.ToString())
                     {
                         this.Dispatcher.Invoke(() =>
                         {
@@ -95,7 +112,7 @@ namespace WpfChatCustomer
             try
             {
                 await connection.InvokeAsync("SendMessage",
-                    userr.Name, txtMessage.Text, idReceiver.ToString(), userr._id.ToString());
+                    thisUser.Name, txtMessage.Text, idReceiver.ToString(), thisUser._id.ToString(), _projectId.ToString());
                 txtMessage.Text = string.Empty;
             }
             catch (Exception ex)

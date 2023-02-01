@@ -115,5 +115,29 @@ namespace BlazorContolWork.Data
         {
             collection.ReplaceOne(x => x._id == _id, newUser);
         }
+
+        public static List<Messages> SearchMessagesThisChat(ObjectId _idCustomerUser, ObjectId _idReceiverUser, ObjectId _idProject)
+        {
+            IMongoCollection<ChatsClass> collectionChats = database.GetCollection<ChatsClass>("Chats");
+
+                var temp2 = collectionChats.Find(x => x._idFirstUser == _idReceiverUser && _idProject == x._idProject && _idCustomerUser == x._idLastUser 
+                || x._idLastUser == _idReceiverUser && _idProject == x._idProject && _idCustomerUser == x._idFirstUser).FirstOrDefault();
+                if (temp2 == null)
+                {
+                    collectionChats.InsertOne(new ChatsClass(_idProject, _idCustomerUser, _idReceiverUser));
+                    return new List<Messages>();
+                }
+                return temp2._messages;
+        }
+
+        public static async Task AddNewMessageInChat(ObjectId _idSendingUser, ObjectId _idReceiverUser, ObjectId _idProject, string message)
+        {
+            IMongoCollection<ChatsClass> collectionChats = database.GetCollection<ChatsClass>("Chats");
+            var temp2 = collectionChats.Find(x => x._idFirstUser == _idReceiverUser && _idProject == x._idProject && _idSendingUser == x._idLastUser || x._idLastUser == _idReceiverUser 
+            && _idProject == x._idProject && _idSendingUser == x._idFirstUser).FirstOrDefault();
+            temp2._messages.Add(new Messages(FindId(_idSendingUser).Name, message));
+            collectionChats.ReplaceOne(x => x._idFirstUser == _idReceiverUser && _idProject == x._idProject && _idSendingUser == x._idLastUser || x._idLastUser == _idReceiverUser
+            && _idProject == x._idProject && _idSendingUser == x._idFirstUser, temp2);
+        }
     }
 }

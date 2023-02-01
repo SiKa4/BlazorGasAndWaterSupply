@@ -10,16 +10,20 @@ namespace WpfChatCustomer
 {
     class ClassProjectNameDevDes
     {
-        public ClassProjectNameDevDes(string name, string departament, string projectName, ObjectId _Id)
+        public ClassProjectNameDevDes(string name, string departament, string projectName, ObjectId _Id, ObjectId _idProject)
         {
             Name = name;
             Departament = departament;
             ProjectName = projectName;
             _id = _Id;
+            this._idProject = _idProject;
         }
 
         [BsonId]
         public ObjectId _id;
+
+        [BsonId]
+        public ObjectId _idProject;
 
         public string Name { get; set; }
         public string Departament { get; set; }
