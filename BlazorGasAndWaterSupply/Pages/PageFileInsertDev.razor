@@ -95,10 +95,10 @@
     </table>
 </p>
 
-<button @onclick="OpenForm">Open chat</button>
+<button @onclick="OpenForm" style="right: 1%; position:fixed ; bottom : 1%" id="BtnOpenForm">Open chat</button>
 <hr>
 
-<div class="chat-popup" id="myForm" style="display : none">
+<div class="chat-popup" id="myForm" style="display : none; position: fixed; top: 42.2%; right:1%">
   <form class="form-container" style="border : 2px solid black; float : right">
     <h3>Чат c @MongoExamples.FindId(singleton.thisProject._idCustomer).Name 
         @MongoExamples.FindId(singleton.thisProject._idCustomer).Surname</h3>
@@ -190,7 +190,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        messages = MongoExamples.SearchMessagesThisChat(singleton.thisProject._idCustomer, singleton.thisProject._idDeveloper, singleton.thisProject._id);
+        messages = MongoExamples.SearchMessagesThisChat(singleton.thisProject._idCustomer, 
+            singleton.thisProject._idDeveloper, singleton.thisProject._id);
         hubConnection = new HubConnectionBuilder()
             .WithUrl(Navigation.ToAbsoluteUri("/chathub"))
             .Build();
@@ -217,6 +218,7 @@
     private async void Send()
     {
         await JsRun.InvokeVoidAsync("disabledBtn");
+        if (messageInput == string.Empty) await JsRun.InvokeVoidAsync("MessageError");
         Task.Delay(50).Wait();
         await JsRun.InvokeVoidAsync("enabledBtn");
 
