@@ -94,11 +94,11 @@
 <button @onclick="OpenForm" style="right: 1%; position:fixed ; bottom : 1%" id="BtnOpenForm">Open chat</button>
 <hr>
 
-<div class="chat-popup" id="myForm" style="display : none; position: fixed; top: 42.2%; right:1%">
+<div class="chat-popup" id="myForm" style="display : none; position: fixed; top: 42.2%; right:1%; border-radius:5%">
   <form class="form-container" style="border : 2px solid black; float : right">
     <h3>Чат c @MongoExamples.FindId(singleton.thisProject._idCustomer).Name 
         @MongoExamples.FindId(singleton.thisProject._idCustomer).Surname</h3>
-    <div style="overflow : auto; height : 250px; border : 2px solid black; word-wrap : break-word;">
+    <div style="overflow : auto; height : 250px; border : 2px solid black; word-wrap : break-word; border-radius:10%">
         <ul id="messagesList">
         @foreach (var message in messages)
         {
@@ -154,7 +154,7 @@
     protected override async Task OnInitializedAsync()
     {
         messages = MongoExamples.SearchMessagesThisChat(singleton.thisProject._idCustomer, 
-            singleton.thisProject._idDeveloper, singleton.thisProject._id);
+            singleton.thisProject._idDesigner, singleton.thisProject._id);
         hubConnection = new HubConnectionBuilder()
             .WithUrl(Navigation.ToAbsoluteUri("/chathub"))
             .Build();
@@ -181,7 +181,11 @@
     private async void Send()
     {
         await JsRun.InvokeVoidAsync("disabledBtn");
-        if (messageInput == string.Empty) await JsRun.InvokeVoidAsync("MessageError");
+        if (messageInput == string.Empty){
+            await JsRun.InvokeVoidAsync("MessageError");
+            await JsRun.InvokeVoidAsync("enabledBtn");
+            return;
+        }
         Task.Delay(50).Wait();
         await JsRun.InvokeVoidAsync("enabledBtn");
 
